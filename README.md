@@ -144,8 +144,22 @@ A ligação entre cada critério de aceite e o teste que o comprova está em [`d
 - Faturamento com NFC-e/SEFAZ (US-18) — apenas a comanda de impressão foi feita
 - E-mail transacional, notificação push (substituída por atualização automática a cada 20s) e gateway de pagamento real
 
+## Deploy na Vercel (com Turso)
+
+Na Vercel não dá para gravar em arquivo, então em produção o banco é o **Turso** (SQLite na nuvem, plano gratuito). O schema e as migrações são os mesmos: quando a variável `TURSO_DATABASE_URL` existe, o app usa o Turso (`lib/adapter.ts`); sem ela, usa o arquivo local.
+
+1. Crie o banco em [turso.tech](https://turso.tech) (ou `turso db create cupcakes`) e copie a **URL** (`libsql://...`) e um **token** (`turso db tokens create cupcakes`).
+2. Crie as tabelas e carregue os dados de exemplo:
+   ```bash
+   TURSO_DATABASE_URL="libsql://..." TURSO_AUTH_TOKEN="..." pnpm db:turso
+   ```
+3. Na Vercel, importe o repositório e defina as variáveis de ambiente `TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN` e `SESSION_SECRET` (gere com `openssl rand -base64 32`). Não é preciso `DATABASE_URL`.
+4. Faça o deploy. Build e instalação usam os comandos padrão (`pnpm install` já gera o Prisma Client).
+
+> `pnpm db:turso` pode ser rodado de novo para restaurar os dados de exemplo — ele **apaga** os pedidos existentes.
+
 ## Observações para produção
 
-- **Deploy:** SQLite não persiste em hospedagem serverless (ex.: Vercel). Use PostgreSQL/Turso ou um host com disco (Railway, Fly.io).
+- **Banco:** em produção roda no Turso (acima). Para PostgreSQL bastaria trocar o `provider` e o adapter.
 - **Concorrência:** no SQLite a checagem de capacidade dentro da transação é segura porque as escritas são serializadas; em PostgreSQL seria preciso `SELECT … FOR UPDATE` ou isolamento serializável.
 - A consulta de pedido por número + e-mail não tem limite de tentativas; em produção, adicionar rate limiting.

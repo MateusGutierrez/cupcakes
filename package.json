@@ -16,13 +16,16 @@
     "db:migrate": "prisma migrate dev",
     "db:seed": "prisma db seed",
     "db:reset": "prisma migrate reset --force && prisma db seed",
+    "db:turso": "tsx scripts/preparar-turso.ts",
     "db:studio": "prisma studio",
     "test:e2e": "playwright test"
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",
     "@hookform/resolvers": "^7.0.5",
+    "@libsql/client": "~0.17.4",
     "@prisma/adapter-better-sqlite3": "^7.10.1",
+    "@prisma/adapter-libsql": "7.10.1",
     "@prisma/client": "^7.10.1",
     "bcryptjs": "^3.0.3",
     "class-variance-authority": "^0.7.1",

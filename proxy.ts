@@ -8,7 +8,9 @@ import { COOKIE_SESSAO, verificarSessao } from "@/lib/sessao-token"
  */
 export async function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl
-  const sessao = await verificarSessao(request.cookies.get(COOKIE_SESSAO)?.value)
+  const sessao = await verificarSessao(
+    request.cookies.get(COOKIE_SESSAO)?.value
+  )
   const naTelaDeLogin = pathname === "/admin/login"
 
   if (!sessao && !naTelaDeLogin) {
