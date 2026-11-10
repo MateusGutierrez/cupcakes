@@ -14,6 +14,7 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     // Client gerado pelo Prisma
     "generated/**",
+    ".next-e2e/**",
   ]),
   // Componentes gerados pelo shadcn: não são editados à mão
   {

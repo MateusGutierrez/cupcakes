@@ -1,7 +1,6 @@
 import { defineConfig, devices } from "@playwright/test"
 
-// Se já houver um `next dev` rodando, use E2E_PORT=3000 pnpm test:e2e
-const PORTA = Number(process.env.E2E_PORT ?? 3123)
+const PORTA = 3123
 
 export default defineConfig({
   testDir: "e2e",
@@ -18,9 +17,12 @@ export default defineConfig({
     { name: "mobile", use: { ...devices["Pixel 7"], channel: "chrome" } },
   ],
   webServer: {
-    command: `pnpm dev --port ${PORTA}`,
+    // Banco próprio recriado a cada execução + pasta de build separada:
+    // não interfere no banco de desenvolvimento nem no `next dev` aberto
+    command: `tsx scripts/preparar-banco-e2e.ts && next dev --port ${PORTA}`,
+    env: { DATABASE_URL: "file:./prisma/e2e.db", NEXT_DIST_DIR: ".next-e2e" },
     url: `http://localhost:${PORTA}`,
-    reuseExistingServer: true,
+    reuseExistingServer: false,
     timeout: 120_000,
   },
 })
