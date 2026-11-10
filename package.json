@@ -15,7 +15,7 @@
     "postinstall": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:seed": "prisma db seed",
-    "db:reset": "prisma migrate reset --force",
+    "db:reset": "prisma migrate reset --force && prisma db seed",
     "db:studio": "prisma studio",
     "test:e2e": "playwright test"
   },
@@ -57,6 +57,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@vitejs/plugin-react": "^6.3.0",
+    "better-sqlite3": "^12.11.1",
     "eslint": "^9",
     "eslint-config-next": "16.4.4",
     "jsdom": "^31.0.0",

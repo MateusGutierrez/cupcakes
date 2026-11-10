@@ -185,33 +185,40 @@ Ordem pensada para que cada passo possa ser testado com o anterior.
 
 ### Fase 3 — Pagamento e criação do pedido
 
+> ✅ **Concluída em 10/11/2026.** Comprovada por `e2e/compra.spec.ts` e `tests/integration/finalizar-pedido.test.ts`. Observações:
+> - A regra de finalização fica em `models/services/finalizar-pedido.ts` (recebe o banco como parâmetro → testável com SQLite temporário); a action só valida, chama o serviço e libera o acesso.
+> - Acesso do convidado ao pedido: cookie assinado (`cg_pedidos`) com os números que ele criou/consultou. Sem o cookie, a página pede o e-mail (formulário vem na Fase 4).
+> - Cartões de teste: `4111 1111 1111 1111` (aprovado) e `4000 0000 0000 0002` (recusado). O QR Code do PIX é fictício.
+> - Concorrência: a transação do SQLite serializa as escritas; em PostgreSQL seria preciso `SELECT … FOR UPDATE` ou isolamento serializável para a checagem de capacidade.
+> - Correção: no Prisma 7 o `migrate reset` não roda mais o seed; o script `db:reset` agora chama `prisma db seed` em seguida.
+
 #### 3.1 Domínio de pagamento e status
-- [ ] `models/domain/pagamento.ts`: Luhn, regra do final `0002`, resultado por método 🧪 `pagamento.test.ts`
-- [ ] `models/domain/status.ts`: máquina de estados completa (incluindo decisão 1.3) 🧪 `status.test.ts`
+- [x] `models/domain/pagamento.ts`: Luhn, regra do final `0002`, resultado por método 🧪 `pagamento.test.ts`
+- [x] `models/domain/status.ts`: máquina de estados completa (incluindo decisão 1.3) 🧪 `status.test.ts`
 - ⏱ 3h · 💬 `feat(US-11): simulador de pagamento e máquina de estados`
 
 #### 3.2 F8 · `finalizarPedido` (a peça mais crítica)
-- [ ] Fluxo dentro de `prisma.$transaction`:
+- [x] Fluxo dentro de `prisma.$transaction`:
   1. validar o input com `checkoutSchema`
   2. buscar produtos atuais (preço, ativo, antecedência) — **nunca usar preço vindo do cliente**
   3. revalidar capacidade do dia, área/frete e data mínima
   4. processar pagamento simulado → se recusado, **não cria pedido** e devolve erro
   5. criar Pedido + Itens (snapshot) + HistoricoStatus inicial
   6. gerar `numero`
-- [ ] Retorno tipado `{ ok: true, numero } | { ok: false, erro, campo? }`
-- [ ] No cliente: limpar carrinho **só** em sucesso, depois `router.push('/pedido/...')`
+- [x] Retorno tipado `{ ok: true, numero } | { ok: false, erro, campo? }`
+- [x] No cliente: limpar carrinho **só** em sucesso, depois `router.push('/pedido/...')`
 - 🧪 Integração: cria tudo; recusa por capacidade; cartão recusado não cria pedido
 - ⏱ 6h · 💬 `feat(US-12): finalização de pedido em transação`
 
 #### 3.3 F7 · UI de pagamento
-- [ ] Cartão (só últimos 4 dígitos vão ao banco), PIX (QR + copia e cola + "Simular pagamento recebido"), dinheiro (troco)
-- [ ] Botão com estado "Processando…" (`useActionState`/`useTransition`)
-- [ ] `controllers/pagamento.actions.ts → confirmarPix(numero)`: `AGUARDANDO_PAGAMENTO → RECEBIDO`
+- [x] Cartão (só últimos 4 dígitos vão ao banco), PIX (QR + copia e cola + "Simular pagamento recebido"), dinheiro (troco)
+- [x] Botão com estado "Processando…" (`useActionState`/`useTransition`)
+- [x] `controllers/pagamento.actions.ts → confirmarPix(numero)`: `AGUARDANDO_PAGAMENTO → RECEBIDO`
 - ⏱ 4h
 
 #### 3.4 Tela de confirmação
-- [ ] `app/(loja)/pedido/[numero]/page.tsx`: número em destaque, copiar, itens, total
-- [ ] Acesso: logo após a compra, guardar o e-mail num cookie curto para abrir sem pedir de novo; fora isso, exigir número + e-mail (evita que qualquer um veja o pedido só com o número)
+- [x] `app/(loja)/pedido/[numero]/page.tsx`: número em destaque, copiar, itens, total
+- [x] Acesso: logo após a compra, guardar o e-mail num cookie curto para abrir sem pedir de novo; fora isso, exigir número + e-mail (evita que qualquer um veja o pedido só com o número)
 - ⏱ 3h · 💬 `feat(US-11, US-12): pagamento simulado e confirmação`
 
 > **Marco Fase 3:** pedido criado com número para os 3 métodos.

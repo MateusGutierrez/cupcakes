@@ -50,7 +50,7 @@ test("checkout valida contato, CEP e data (US-02, US-09, US-10)", async ({
   await page.goto("/checkout")
 
   // Campos obrigatórios destacados (US-02 CA#2)
-  await page.getByRole("button", { name: "Continuar" }).click()
+  await page.getByRole("button", { name: /^Confirmar pedido/ }).click()
   await expect(page.getByText("Informe seu nome completo")).toBeVisible()
   await expect(page.getByText("Informe um e-mail válido")).toBeVisible()
   await expect(page.getByText("Informe um telefone com DDD")).toBeVisible()
@@ -105,6 +105,8 @@ test("checkout valida contato, CEP e data (US-02, US-09, US-10)", async ({
   await expect(page.locator("details")).toContainText("Grátis (retirada)")
   await expect(page.locator("details")).toContainText("R$ 36,00")
 
-  await page.getByRole("button", { name: "Continuar" }).click()
-  await expect(page.getByText("Dados conferidos!")).toBeVisible()
+  await page.getByRole("button", { name: /^Confirmar pedido/ }).click()
+  // Sem forma de pagamento escolhida o pedido não é enviado
+  await expect(page.getByText("Escolha a forma de pagamento")).toBeVisible()
+  await expect(page).toHaveURL(/\/checkout$/)
 })

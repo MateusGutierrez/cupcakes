@@ -16,11 +16,12 @@ export type ProdutoComDisponibilidade = Produto & { disponivelHoje: number }
 /** Unidades vendidas por produto em um dia da loja ("AAAA-MM-DD"), ignorando cancelados. */
 export async function vendidosNoDia(
   produtoIds: number[],
-  dia: string
+  dia: string,
+  tx: Prisma.TransactionClient = db
 ): Promise<Map<number, number>> {
   if (produtoIds.length === 0) return new Map()
   const { inicio, fim } = intervaloDoDia(dia)
-  const grupos = await db.itemPedido.groupBy({
+  const grupos = await tx.itemPedido.groupBy({
     by: ["produtoId"],
     where: {
       produtoId: { in: produtoIds },

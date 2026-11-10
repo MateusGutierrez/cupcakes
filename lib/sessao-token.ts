@@ -9,7 +9,8 @@ export const DURACAO_SESSAO_MS = 8 * 60 * 60 * 1000 // um turno de trabalho
 
 export type DadosSessao = { usuarioId: number; papel: Papel; nome: string }
 
-function chave() {
+/** Chave HMAC derivada de SESSION_SECRET (também usada no cookie de acesso a pedidos). */
+export function chave() {
   const segredo = process.env.SESSION_SECRET
   if (!segredo || segredo.length < 32) {
     throw new Error(

@@ -81,7 +81,7 @@ export type Totais = {
 
 /** RN#16: total = soma dos subtotais + frete. */
 export function calcularTotais(
-  itens: ItemCarrinho[],
+  itens: Pick<ItemCarrinho, "precoCentavos" | "quantidade">[],
   freteCentavos = 0
 ): Totais {
   const subtotalCentavos = itens.reduce(

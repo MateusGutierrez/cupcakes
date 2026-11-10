@@ -2,7 +2,8 @@
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { StoreIcon, TruckIcon } from "lucide-react"
-import { useState } from "react"
+import { useRouter } from "next/navigation"
+import { useState, useTransition } from "react"
 import { Controller, useForm, useWatch } from "react-hook-form"
 import { toast } from "sonner"
 
@@ -21,34 +22,42 @@ import {
 import { Input } from "@/components/ui/input"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Skeleton } from "@/components/ui/skeleton"
+import { Spinner } from "@/components/ui/spinner"
 import { Textarea } from "@/components/ui/textarea"
+import { finalizarPedido } from "@/controllers/checkout.actions"
 import type { ResultadoCEP } from "@/controllers/entrega.actions"
 import { useRevalidarCarrinho } from "@/hooks/use-revalidar-carrinho"
 import { formatBRL, formatTelefone } from "@/lib/format"
 import { LOJA } from "@/lib/loja"
 import { calcularTotais, maiorAntecedencia } from "@/models/domain/carrinho"
 import {
-  type CheckoutDados,
-  type CheckoutEntrada,
-  checkoutSchema,
+  type PedidoDados,
+  type PedidoEntrada,
+  pedidoSchema,
 } from "@/models/schemas/checkout.schema"
 import { useCarrinho } from "@/stores/carrinho.store"
 
 import { CarrinhoVazio } from "../carrinho-vazio"
 import { CampoCEP } from "./campo-cep"
 import { ResumoPedido } from "./resumo-pedido"
+import { SecaoPagamento } from "./secao-pagamento"
 import { SeletorData } from "./seletor-data"
 
 const SECAO = "rounded-xl border bg-card p-4"
 
 // US-02, US-10 — checkout como convidado, em página única (RNF#05)
 export function CheckoutForm() {
+  const router = useRouter()
   const carregando = useRevalidarCarrinho()
   const itens = useCarrinho((s) => s.itens)
+  const limparCarrinho = useCarrinho((s) => s.limpar)
   const [cep, setCep] = useState<ResultadoCEP | null>(null)
+  const [recusa, setRecusa] = useState<string>()
+  const [enviando, iniciar] = useTransition()
+  const [finalizado, setFinalizado] = useState(false)
 
-  const form = useForm<CheckoutEntrada, unknown, CheckoutDados>({
-    resolver: zodResolver(checkoutSchema),
+  const form = useForm<PedidoEntrada, unknown, PedidoDados>({
+    resolver: zodResolver(pedidoSchema),
     mode: "onTouched",
     defaultValues: {
       modalidade: "ENTREGA",
@@ -79,21 +88,32 @@ export function CheckoutForm() {
       campo
     ]?.message
 
-  const [modalidade, data, horario] = useWatch({
+  const [modalidade, data, horario, formaPagamento] = useWatch({
     control,
-    name: ["modalidade", "data", "horario"],
+    name: ["modalidade", "data", "horario", "formaPagamento"],
   })
   const retirada = modalidade === "RETIRADA"
   // RN#20: retirada zera o frete
   const frete = retirada ? 0 : cep?.ok ? cep.freteCentavos : null
   const totais = calcularTotais(itens, frete ?? 0)
 
+  // Depois de finalizar o carrinho é limpo; evita piscar "carrinho vazio" antes do redirect
+  if (finalizado) {
+    return (
+      <p
+        className="flex items-center justify-center gap-2 py-16 text-muted-foreground"
+        role="status"
+      >
+        <Spinner /> Abrindo seu pedido…
+      </p>
+    )
+  }
   if (carregando && itens.length === 0) {
     return <Skeleton className="h-96 w-full rounded-xl" aria-busy="true" />
   }
   if (itens.length === 0) return <CarrinhoVazio />
 
-  function onValido(dados: CheckoutDados) {
+  function onValido(dados: PedidoDados) {
     if (dados.modalidade === "ENTREGA" && !cep?.ok) {
       setError(
         "cep",
@@ -102,9 +122,39 @@ export function CheckoutForm() {
       )
       return
     }
-    // TODO(Fase 3): pagamento simulado + finalizarPedido
-    toast.success("Dados conferidos!", {
-      description: "O pagamento é a próxima etapa.",
+    setRecusa(undefined)
+    iniciar(async () => {
+      // Envia os dados brutos: o servidor valida de novo com o mesmo schema
+      const r = await finalizarPedido(
+        getValues(),
+        itens.map((i) => ({ produtoId: i.produtoId, quantidade: i.quantidade }))
+      )
+      if (r.ok) {
+        setFinalizado(true)
+        limparCarrinho() // só depois do sucesso (RN#23)
+        router.push(`/pedido/${r.numero}`)
+        return
+      }
+      if (r.campo === "pagamento") {
+        setRecusa(r.mensagem)
+        toast.error("Pagamento não aprovado", { description: r.mensagem })
+        return
+      }
+      if (r.campo) {
+        setError(
+          r.campo as keyof PedidoEntrada,
+          { message: r.mensagem },
+          { shouldFocus: true }
+        )
+      }
+      toast.error(r.mensagem, {
+        action: r.carrinhoDesatualizado
+          ? {
+              label: "Revisar carrinho",
+              onClick: () => router.push("/carrinho"),
+            }
+          : undefined,
+      })
     })
   }
 
@@ -302,7 +352,7 @@ export function CheckoutForm() {
             horario={horario}
             onData={(d) => setValue("data", d, { shouldValidate: true })}
             onHorario={(h) =>
-              setValue("horario", h as CheckoutEntrada["horario"], {
+              setValue("horario", h as PedidoEntrada["horario"], {
                 shouldValidate: Boolean(h),
               })
             }
@@ -322,12 +372,16 @@ export function CheckoutForm() {
           </Field>
         </FieldSet>
 
-        {/* 4. Pagamento — Fase 3 */}
+        {/* 4. Pagamento */}
         <FieldSet className={SECAO}>
           <FieldLegend>4. Pagamento</FieldLegend>
-          <p className="text-sm text-muted-foreground">
-            Cartão, PIX ou dinheiro na entrega.
-          </p>
+          <SecaoPagamento
+            control={control}
+            register={register}
+            forma={formaPagamento}
+            erro={erro}
+            recusa={recusa}
+          />
         </FieldSet>
       </div>
 
@@ -339,8 +393,17 @@ export function CheckoutForm() {
             {formatBRL(totais.totalCentavos)}
           </span>
         </div>
-        <Button type="submit" size="touch" className="flex-1 lg:w-full">
-          Continuar
+        {/* Desabilitado durante o envio: evita clique duplo e cobrança dupla */}
+        <Button
+          type="submit"
+          size="touch"
+          className="flex-1 lg:w-full"
+          disabled={enviando}
+        >
+          {enviando && <Spinner />}
+          {enviando
+            ? "Processando…"
+            : `Confirmar pedido · ${formatBRL(totais.totalCentavos)}`}
         </Button>
       </div>
     </form>

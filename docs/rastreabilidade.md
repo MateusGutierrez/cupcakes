@@ -37,3 +37,14 @@ Atualizada ao fim de cada feature.
 | US-02 · CA#2 / RN#05 | Nome, e-mail e telefone obrigatórios | `models/schemas/checkout.schema.ts` | `tests/unit/checkout-schema.test.ts`, E2E |
 | RN#20 | Retirada zera o frete | `calcularFrete`, `checkout-form.tsx` | `tests/unit/entrega.test.ts`, E2E |
 | RN#19 / RNF#19 | Datas antes da maior antecedência bloqueadas | `models/domain/agenda.ts`, `seletor-data.tsx` | `tests/unit/agenda.test.ts`, E2E |
+| US-11 · CA#1 / RNF#20 | Cartão válido (Luhn) aprovado; só 4 últimos dígitos guardados | `models/domain/pagamento.ts`, `checkout.schema.ts` | `tests/unit/pagamento.test.ts`, integração, E2E `compra.spec.ts` |
+| US-11 · CA#4 / RN#23 | Recusa preserva o carrinho e permite trocar o método | `processarPagamento`, `checkout-form.tsx` | `tests/unit/pagamento.test.ts`, integração, E2E |
+| RN#21 | PIX deixa o pedido aguardando pagamento | `processarPagamento`, `controllers/pagamento.actions.ts → confirmarPix` | `tests/unit/pagamento.test.ts`, integração, E2E |
+| RN#22 | Dinheiro na entrega com troco | `processarPagamento`, `secao-pagamento.tsx` | `tests/unit/pagamento.test.ts`, E2E |
+| US-12 · CA#1 | Confirmação com número, itens, total, pagamento e modalidade | `app/(loja)/pedido/[numero]/page.tsx` | E2E `compra.spec.ts` |
+| RN#24 | Número legível e único (CG-000123) | `models/domain/status.ts → gerarNumeroPedido`, `criarPedido` | `tests/unit/status.test.ts`, integração |
+| RN#14 (finalização) | Capacidade revalidada na transação | `models/services/finalizar-pedido.ts` | `tests/integration/finalizar-pedido.test.ts` |
+| ItemPedido (snapshot) | Preço do item não muda se o produto mudar | `criarPedido` | `tests/integration/finalizar-pedido.test.ts` |
+| RN#26 / RN#28 | Máquina de estados; cancelar só antes do preparo | `models/domain/status.ts` | `tests/unit/status.test.ts` |
+| RN#06 (privacidade) | Pedido só visível para quem o fez | `lib/acesso-pedido.ts` | E2E "pedido de outra pessoa não é exibido" |
+
