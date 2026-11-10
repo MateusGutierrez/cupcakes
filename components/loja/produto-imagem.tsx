@@ -25,6 +25,7 @@ export function ProdutoImagem({ src, alt, sizes, preload, className }: Props) {
         fill
         sizes={sizes}
         preload={preload}
+        loading={preload ? "eager" : undefined}
         unoptimized={!src.startsWith("/")}
         className="object-cover"
       />

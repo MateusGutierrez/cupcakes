@@ -47,4 +47,8 @@ Atualizada ao fim de cada feature.
 | ItemPedido (snapshot) | Preço do item não muda se o produto mudar | `criarPedido` | `tests/integration/finalizar-pedido.test.ts` |
 | RN#26 / RN#28 | Máquina de estados; cancelar só antes do preparo | `models/domain/status.ts` | `tests/unit/status.test.ts` |
 | RN#06 (privacidade) | Pedido só visível para quem o fez | `lib/acesso-pedido.ts` | E2E "pedido de outra pessoa não é exibido" |
+| US-13 · CA#1 / RN#27 | Linha do tempo com data/hora de cada etapa | `models/domain/status.ts → linhaDoTempo`, `status-timeline.tsx` | `tests/unit/status.test.ts`, E2E `acompanhar.spec.ts` |
+| US-13 · CA#3 | Convidado consulta com número + e-mail; e-mail errado não vaza dados | `controllers/pedido.actions.ts`, `buscarPedidoDoCliente` | `tests/integration/consultar-pedido.test.ts`, E2E |
+| US-13 · CA#4 | Pedido entregue aparece concluído | `linhaDoTempo` | `tests/unit/status.test.ts` |
+| RNF#24 (adaptada) | Atualização por polling a cada 20s | `components/loja/atualizacao-automatica.tsx` | Checklist manual |
 

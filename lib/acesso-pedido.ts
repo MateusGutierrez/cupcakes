@@ -48,3 +48,8 @@ export async function concederAcessoAoPedido(numero: string) {
     expires: expira,
   })
 }
+
+/** Números de pedido que este navegador pode ver (mais recente primeiro). */
+export async function pedidosComAcesso(): Promise<string[]> {
+  return lerNumeros()
+}

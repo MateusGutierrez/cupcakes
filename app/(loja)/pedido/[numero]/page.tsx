@@ -5,7 +5,9 @@ import { notFound } from "next/navigation"
 import QRCode from "qrcode"
 
 import { CopiarBotao } from "@/components/copiar-botao"
+import { AtualizacaoAutomatica } from "@/components/loja/atualizacao-automatica"
 import { SimularPixBotao } from "@/components/loja/simular-pix-botao"
+import { StatusTimeline } from "@/components/loja/status-timeline"
 import { Badge } from "@/components/ui/badge"
 import { buttonVariants } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
@@ -18,7 +20,7 @@ import {
   ROTULO_MODALIDADE,
   ROTULO_STATUS_PAGAMENTO,
 } from "@/models/domain/rotulos"
-import { ROTULO_STATUS } from "@/models/domain/status"
+import { ehTerminal, linhaDoTempo, ROTULO_STATUS } from "@/models/domain/status"
 import { buscarPedidoPorNumero } from "@/models/repositories/pedido.repository"
 
 export async function generateMetadata({
@@ -88,7 +90,14 @@ export default async function PedidoPage({
     ? "Pedido cancelado"
     : aguardandoPix
       ? "Falta pagar o PIX"
-      : "Pedido confirmado!"
+      : pedido.status === "ENTREGUE"
+        ? "Pedido entregue. Bom apetite!"
+        : "Pedido confirmado!"
+  const etapas = linhaDoTempo(
+    pedido.modalidade,
+    pedido.status,
+    pedido.historico
+  )
 
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-4">
@@ -164,6 +173,22 @@ export default async function PedidoPage({
           </p>
         </section>
       )}
+
+      <section
+        aria-labelledby="titulo-andamento"
+        className="flex flex-col gap-3 rounded-xl border bg-card p-4"
+      >
+        <h2 id="titulo-andamento" className="font-semibold">
+          Andamento
+        </h2>
+        <StatusTimeline etapas={etapas} />
+        {!ehTerminal(pedido.status) && (
+          <p className="text-xs text-muted-foreground">
+            Esta página se atualiza sozinha.
+          </p>
+        )}
+      </section>
+      {!ehTerminal(pedido.status) && <AtualizacaoAutomatica />}
 
       <section
         aria-labelledby="titulo-detalhes"

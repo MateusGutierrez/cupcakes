@@ -235,9 +235,11 @@ Ordem pensada para que cada passo possa ser testado com o anterior.
 - ⏱ 6h · 💬 `feat(US-17): painel de pedidos com avanço de status`
 
 #### 4.2 F9 · Acompanhar pedido
-- [ ] `controllers/pedido.actions.ts → consultarPedido(numero, email)` — mesma resposta para "não existe" e "e-mail errado"
-- [ ] `/acompanhar` + `StatusTimeline` com data/hora
-- [ ] Polling com `router.refresh()` a cada 20s, parando quando `ENTREGUE`/`CANCELADO`
+
+> ✅ **Adiantada em 10/11/2026** (o link "Pedido" da navegação dava 404). `/acompanhar` lista os pedidos deste aparelho e consulta outros por número + e-mail; o número aceita "123", "cg123" ou "CG-000123".
+- [x] `controllers/pedido.actions.ts → consultarPedido(numero, email)` — mesma resposta para "não existe" e "e-mail errado"
+- [x] `/acompanhar` + `StatusTimeline` com data/hora
+- [x] Polling com `router.refresh()` a cada 20s, parando quando `ENTREGUE`/`CANCELADO`
 - 🧪 Integração `consultarPedido`
 - ⏱ 4h · 💬 `feat(US-13): acompanhamento do pedido`
 

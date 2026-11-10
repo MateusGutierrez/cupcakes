@@ -68,3 +68,67 @@ export function podeTransicionar(
 export function gerarNumeroPedido(id: number): string {
   return `CG-${String(id).padStart(6, "0")}`
 }
+
+export type EtapaLinhaDoTempo = {
+  status: StatusPedido
+  rotulo: string
+  /** Quando o pedido entrou nesta etapa (do histórico), se já entrou. */
+  quando: Date | null
+  estado: "feito" | "atual" | "pendente"
+}
+
+/**
+ * Monta a linha do tempo do pedido (US-13 CA#1) a partir do histórico (RN#27).
+ * Pedidos pagos na hora não passam por "Aguardando pagamento", então essa etapa
+ * só aparece quando consta no histórico. Cancelado encerra a linha.
+ */
+export function linhaDoTempo(
+  modalidade: Modalidade,
+  status: StatusPedido,
+  historico: { para: StatusPedido; createdAt: Date }[]
+): EtapaLinhaDoTempo[] {
+  const quando = new Map<StatusPedido, Date>()
+  for (const h of historico) quando.set(h.para, h.createdAt)
+
+  let etapas = etapasDoPedido(modalidade)
+  if (!quando.has("AGUARDANDO_PAGAMENTO"))
+    etapas = etapas.filter((e) => e !== "AGUARDANDO_PAGAMENTO")
+
+  if (status === "CANCELADO") {
+    const feitas = etapas.filter((e) => quando.has(e))
+    return [
+      ...feitas.map((e) => ({
+        status: e,
+        rotulo: ROTULO_STATUS[e],
+        quando: quando.get(e)!,
+        estado: "feito" as const,
+      })),
+      {
+        status: "CANCELADO",
+        rotulo: ROTULO_STATUS.CANCELADO,
+        quando: quando.get("CANCELADO") ?? null,
+        estado: "atual",
+      },
+    ]
+  }
+
+  const atual = etapas.indexOf(status)
+  return etapas.map((e, i) => ({
+    status: e,
+    rotulo: ROTULO_STATUS[e],
+    quando: i <= atual ? (quando.get(e) ?? null) : null,
+    // Entregue é o fim: aparece como concluído (US-13 CA#4)
+    estado:
+      i < atual || (i === atual && e === "ENTREGUE")
+        ? "feito"
+        : i === atual
+          ? "atual"
+          : "pendente",
+  }))
+}
+
+/** Normaliza o que o cliente digita: "123", "cg123", "CG-000123" → "CG-000123". */
+export function normalizarNumeroPedido(texto: string): string | null {
+  const m = /^\s*(?:cg)?[\s-]*0*(\d{1,9})\s*$/i.exec(texto)
+  return m ? gerarNumeroPedido(Number(m[1])) : null
+}

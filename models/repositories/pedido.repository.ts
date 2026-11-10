@@ -2,7 +2,7 @@ import "server-only"
 
 import { randomUUID } from "node:crypto"
 
-import type { Prisma } from "@/generated/prisma/client"
+import type { Prisma, PrismaClient } from "@/generated/prisma/client"
 import type { StatusPedido } from "@/generated/prisma/enums"
 import { db } from "@/lib/db"
 import { gerarNumeroPedido } from "@/models/domain/status"
@@ -66,5 +66,39 @@ export async function registrarMudancaDeStatus(
   return tx.pedido.update({
     where: { id: pedido.id },
     data: { ...extra, status: para },
+  })
+}
+
+/**
+ * Pedido do convidado por número + e-mail (US-13 CA#3). Retorna null tanto se o
+ * número não existe quanto se o e-mail não confere, para não revelar nada.
+ */
+export async function buscarPedidoDoCliente(
+  numero: string,
+  email: string,
+  cliente: PrismaClient = db
+) {
+  const pedido = await cliente.pedido.findUnique({
+    where: { numero },
+    select: { numero: true, email: true },
+  })
+  return pedido && pedido.email === email.trim().toLowerCase()
+    ? pedido.numero
+    : null
+}
+
+/** Resumo para a lista "seus pedidos". */
+export function listarResumoPedidos(numeros: string[]) {
+  if (numeros.length === 0) return Promise.resolve([])
+  return db.pedido.findMany({
+    where: { numero: { in: numeros } },
+    select: {
+      numero: true,
+      status: true,
+      totalCentavos: true,
+      dataAgendada: true,
+      modalidade: true,
+    },
+    orderBy: { createdAt: "desc" },
   })
 }
