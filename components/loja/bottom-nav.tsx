@@ -5,6 +5,7 @@ import { usePathname, useSearchParams } from "next/navigation"
 
 import { cn } from "@/lib/utils"
 
+import { CarrinhoContador } from "./carrinho-contador"
 import { itemAtivo, NAV_ITEMS } from "./nav-items"
 
 /** Navegação fixa no rodapé, só no celular (some a partir do `md`). */
@@ -30,7 +31,12 @@ export function BottomNav() {
                   ativo && "text-primary"
                 )}
               >
-                <Icon className="size-6" aria-hidden />
+                <span className="relative">
+                  <Icon className="size-6" aria-hidden />
+                  {href === "/carrinho" && (
+                    <CarrinhoContador className="absolute -top-1.5 -right-2.5" />
+                  )}
+                </span>
                 {label}
               </Link>
             </li>

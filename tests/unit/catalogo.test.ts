@@ -1,12 +1,28 @@
 import { describe, expect, it } from "vitest"
 
-import { filtrarCatalogo, isSelo, normalizar, selosDoProduto } from "@/models/domain/catalogo"
+import {
+  filtrarCatalogo,
+  isSelo,
+  normalizar,
+  selosDoProduto,
+} from "@/models/domain/catalogo"
 
-const base = { descricao: "", ingredientes: "", semGluten: false, semLactose: false, vegano: false }
+const base = {
+  descricao: "",
+  ingredientes: "",
+  semGluten: false,
+  semLactose: false,
+  vegano: false,
+}
 const produtos = [
   { ...base, nome: "Limão Siciliano", ingredientes: "limão, açúcar" },
   { ...base, nome: "Coco Vegano", vegano: true, semLactose: true },
-  { ...base, nome: "Banana com Canela", semGluten: true, descricao: "Farinha de arroz" },
+  {
+    ...base,
+    nome: "Banana com Canela",
+    semGluten: true,
+    descricao: "Farinha de arroz",
+  },
 ]
 
 describe("normalizar", () => {
@@ -18,9 +34,9 @@ describe("normalizar", () => {
 
 describe("filtrarCatalogo", () => {
   it("busca ignora acentos e maiúsculas (US-05)", () => {
-    expect(filtrarCatalogo(produtos, { busca: "LIMAO" }).map((p) => p.nome)).toEqual([
-      "Limão Siciliano",
-    ])
+    expect(
+      filtrarCatalogo(produtos, { busca: "LIMAO" }).map((p) => p.nome)
+    ).toEqual(["Limão Siciliano"])
   })
 
   it("busca também na descrição e nos ingredientes", () => {
@@ -34,7 +50,9 @@ describe("filtrarCatalogo", () => {
 
   it("filtra por selo e combina com a busca", () => {
     expect(filtrarCatalogo(produtos, { selo: "vegano" })).toHaveLength(1)
-    expect(filtrarCatalogo(produtos, { selo: "semLactose", busca: "banana" })).toEqual([])
+    expect(
+      filtrarCatalogo(produtos, { selo: "semLactose", busca: "banana" })
+    ).toEqual([])
   })
 
   it("sem filtros retorna tudo", () => {

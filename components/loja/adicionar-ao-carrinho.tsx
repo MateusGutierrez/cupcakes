@@ -1,26 +1,47 @@
 "use client"
 
+import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
 import { formatBRL } from "@/lib/format"
+import type { ItemCarrinho } from "@/models/domain/carrinho"
+import { useCarrinho } from "@/stores/carrinho.store"
 
 import { QuantidadeStepper } from "./quantidade-stepper"
 
 type Props = {
-  produto: { id: number; nome: string; precoCentavos: number }
+  produto: Omit<ItemCarrinho, "quantidade" | "maximo">
   disponivel: number
 }
 
 /** Barra fixa com quantidade + "Adicionar". Fica acima da BottomNav no celular. */
 export function AdicionarAoCarrinho({ produto, disponivel }: Props) {
+  const router = useRouter()
+  const adicionar = useCarrinho((s) => s.adicionar)
   const [qtd, setQtd] = useState(1)
   const indisponivel = disponivel === 0
 
-  function adicionar() {
-    // TODO(Fase 2): adicionar ao carrinho.store
-    toast.success(`${qtd}× ${produto.nome} adicionado ao carrinho`)
+  function onAdicionar() {
+    const limitado = adicionar({ ...produto, maximo: disponivel }, qtd)
+    const acao = {
+      label: "Ver carrinho",
+      onClick: () => router.push("/carrinho"),
+    }
+    if (limitado) {
+      // US-07 CA#3 / RN#14
+      toast.warning(
+        `Só temos ${disponivel} unidade(s) de ${produto.nome} hoje.`,
+        {
+          description: "Ajustamos a quantidade no seu carrinho.",
+          action: acao,
+        }
+      )
+    } else {
+      toast.success(`${qtd}× ${produto.nome} no carrinho`, { action: acao })
+    }
+    setQtd(1)
   }
 
   return (
@@ -38,7 +59,7 @@ export function AdicionarAoCarrinho({ produto, disponivel }: Props) {
       ) : (
         <div className="flex items-center gap-3">
           <QuantidadeStepper valor={qtd} onChange={setQtd} max={disponivel} />
-          <Button size="touch" className="flex-1" onClick={adicionar}>
+          <Button size="touch" className="flex-1" onClick={onAdicionar}>
             Adicionar · {formatBRL(produto.precoCentavos * qtd)}
           </Button>
         </div>

@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest"
 
-import { calcularDisponivel, estaIndisponivel, ocupaCapacidade } from "@/models/domain/capacidade"
+import {
+  calcularDisponivel,
+  estaIndisponivel,
+  ocupaCapacidade,
+} from "@/models/domain/capacidade"
 
 describe("capacidade diária (RN#14)", () => {
   it("disponível = limite − vendidos", () => {

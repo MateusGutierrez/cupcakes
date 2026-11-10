@@ -1,6 +1,7 @@
 import { CakeSliceIcon } from "lucide-react"
 import Link from "next/link"
 
+import { CarrinhoContador } from "./carrinho-contador"
 import { NAV_ITEMS } from "./nav-items"
 
 /** Cabeçalho da loja. No celular mostra só a marca; os links aparecem a partir do `md`. */
@@ -25,6 +26,7 @@ export function SiteHeader() {
                 >
                   <Icon className="size-4" aria-hidden />
                   {label}
+                  {href === "/carrinho" && <CarrinhoContador />}
                 </Link>
               </li>
             ))}

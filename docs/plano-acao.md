@@ -146,29 +146,37 @@ Ordem pensada para que cada passo possa ser testado com o anterior.
 
 ### Fase 2 — Carrinho e checkout (sem pagamento)
 
+> ✅ **Concluída em 10/11/2026.** Comprovada por `e2e/carrinho-checkout.spec.ts`. Observações:
+> - Carrinho em página própria (`/carrinho`) + toast com atalho "Ver carrinho"; o drawer global foi dispensado (menos código, mesma função).
+> - Horário escolhido por botões (chips) em vez de `Select`: mais fácil de tocar no celular.
+> - Preparo mínimo de 2h mesmo para pronta entrega; agendamento até 30 dias à frente.
+> - Produto sob encomenda usa o limite diário como teto no carrinho (a produção de hoje não importa para ele); a capacidade da data escolhida é conferida ao finalizar (Fase 3).
+> - ViaCEP preenche rua e bairro quando responde; se falhar, o cliente digita (US-09 CA#4).
+> - O botão "Continuar" só valida os dados por enquanto; pagamento e criação do pedido entram na Fase 3.
+
 #### 2.1 Domínio do carrinho
-- [ ] `models/domain/carrinho.ts`: `adicionar`, `alterarQtd`, `remover`, `totais` — funções puras usadas pelo store
+- [x] `models/domain/carrinho.ts`: `adicionar`, `alterarQtd`, `remover`, `totais` — funções puras usadas pelo store
 - 🧪 `carrinho.test.ts` · ⏱ 2h
 
 #### 2.2 F4 · Store + UI do carrinho
-- [ ] `stores/carrinho.store.ts` (Zustand + persist) guardando `produtoId`, nome, preço, imagem, `capacidade` e `antecedenciaHoras` do momento da adição
-- [ ] Cuidado com **hidratação**: o contador só aparece depois de montar no cliente (evita erro de SSR × localStorage)
-- [ ] Drawer do carrinho, página `/carrinho`, estado vazio, contador no BottomNav
-- [ ] Ligar o botão "Adicionar" da Fase 1
-- [ ] `controllers/carrinho.actions.ts → revalidarCarrinho(itens)`: devolve preços e capacidade atuais; chamado ao abrir o checkout
+- [x] `stores/carrinho.store.ts` (Zustand + persist) guardando `produtoId`, nome, preço, imagem, `capacidade` e `antecedenciaHoras` do momento da adição
+- [x] Cuidado com **hidratação**: o contador só aparece depois de montar no cliente (evita erro de SSR × localStorage)
+- [x] Drawer do carrinho, página `/carrinho`, estado vazio, contador no BottomNav
+- [x] Ligar o botão "Adicionar" da Fase 1
+- [x] `controllers/carrinho.actions.ts → revalidarCarrinho(itens)`: devolve preços e capacidade atuais; chamado ao abrir o checkout
 - ⏱ 5h · 💬 `feat(US-07, US-08): carrinho persistente com teto de capacidade`
 
 #### 2.3 F5 · CEP e frete
-- [ ] `models/domain/entrega.ts`: `validarCEP`, `buscarArea`, `calcularFrete` 🧪 `entrega.test.ts`
-- [ ] Componente de CEP com máscara; fora da área → sugere retirada
-- [ ] (Opcional) ViaCEP com timeout e fallback manual
+- [x] `models/domain/entrega.ts`: `validarCEP`, `buscarArea`, `calcularFrete` 🧪 `entrega.test.ts`
+- [x] Componente de CEP com máscara; fora da área → sugere retirada
+- [x] (Opcional) ViaCEP com timeout e fallback manual
 - ⏱ 3h · 💬 `feat(US-09): validação de CEP e cálculo de frete`
 
 #### 2.4 F6 · Checkout
-- [ ] `models/schemas/checkout.schema.ts` (com `discriminatedUnion` por modalidade: endereço só obrigatório em ENTREGA)
-- [ ] `models/domain/agenda.ts`: `primeiraDataPermitida(agora, maiorAntecedencia)` e horários fixos 🧪
-- [ ] Página única com as 4 seções; resumo colapsável (mobile) / coluna lateral (`lg:`)
-- [ ] Barra fixa "Finalizar pedido" no rodapé
+- [x] `models/schemas/checkout.schema.ts` (com `discriminatedUnion` por modalidade: endereço só obrigatório em ENTREGA)
+- [x] `models/domain/agenda.ts`: `primeiraDataPermitida(agora, maiorAntecedencia)` e horários fixos 🧪
+- [x] Página única com as 4 seções; resumo colapsável (mobile) / coluna lateral (`lg:`)
+- [x] Barra fixa "Finalizar pedido" no rodapé
 - ⏱ 6h · 💬 `feat(US-02, US-10): checkout como convidado`
 
 > **Marco Fase 2:** carrinho completo e checkout validando CEP e datas.

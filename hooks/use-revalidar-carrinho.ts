@@ -1,0 +1,34 @@
+"use client"
+
+import { useEffect, useRef, useState } from "react"
+import { toast } from "sonner"
+
+import { revalidarCarrinho } from "@/controllers/carrinho.actions"
+import { useCarrinho, useCarrinhoHidratado } from "@/stores/carrinho.store"
+
+/**
+ * Ao montar, confere o carrinho local com o servidor (preço, capacidade, produtos
+ * removidos) e mostra os avisos. Retorna true enquanto a conferência não terminou.
+ */
+export function useRevalidarCarrinho() {
+  const hidratado = useCarrinhoHidratado()
+  const [conferindo, setConferindo] = useState(true)
+  const feito = useRef(false)
+
+  useEffect(() => {
+    if (!hidratado || feito.current) return
+    feito.current = true
+    const { itens, substituir } = useCarrinho.getState()
+    if (itens.length === 0) return
+    revalidarCarrinho(itens)
+      .then((r) => {
+        substituir(r.itens)
+        r.avisos.forEach((a) => toast.warning(a))
+      })
+      .catch(() => toast.error("Não foi possível conferir o carrinho agora."))
+      .finally(() => setConferindo(false))
+  }, [hidratado])
+
+  const vazio = useCarrinho((s) => s.itens.length === 0)
+  return !hidratado || (conferindo && !vazio)
+}

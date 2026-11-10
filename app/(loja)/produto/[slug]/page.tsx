@@ -8,6 +8,7 @@ import { ProdutoImagem } from "@/components/loja/produto-imagem"
 import { SelosProduto } from "@/components/loja/selos-produto"
 import { Separator } from "@/components/ui/separator"
 import { formatBRL } from "@/lib/format"
+import { maximoNoCarrinho } from "@/models/domain/carrinho"
 import { buscarProdutoAtivoPorSlug } from "@/models/repositories/produto.repository"
 
 export async function generateMetadata({
@@ -105,11 +106,14 @@ export default async function ProdutoPage({
 
         <AdicionarAoCarrinho
           produto={{
-            id: produto.id,
+            produtoId: produto.id,
+            slug: produto.slug,
             nome: produto.nome,
             precoCentavos: produto.precoCentavos,
+            imagemUrl: produto.imagemUrl,
+            antecedenciaHoras: produto.antecedenciaHoras,
           }}
-          disponivel={produto.disponivelHoje}
+          disponivel={maximoNoCarrinho(produto)}
         />
       </div>
     </article>

@@ -23,3 +23,17 @@ Atualizada ao fim de cada feature.
 | RN#13 | Alergênicos obrigatórios no cadastro | `produtoSchema.alergenicos` | `tests/unit/schemas.test.ts`, E2E |
 | RN#35 | Produto novo nasce inativo | `controllers/admin-produto.actions.ts → salvarProduto` | E2E `admin-produto.spec.ts` |
 | RNF#31 | Log de auditoria das ações da equipe | `registrarAuditoria` (login, criar, editar, ativar/pausar) | — (integração na Fase 4) |
+| US-07 · CA#3 / RN#14 | Teto de quantidade pela capacidade, com aviso | `models/domain/carrinho.ts → adicionarItem` | `tests/unit/carrinho.test.ts` |
+| US-07 · CA#4 | Produto repetido soma a quantidade | `adicionarItem` | `tests/unit/carrinho.test.ts`, E2E `carrinho-checkout.spec.ts` |
+| US-07 · CA#4 (vazio) | Carrinho vazio com "Ver vitrine" | `components/loja/carrinho-vazio.tsx` | E2E `carrinho-checkout.spec.ts` |
+| US-08 · CA#3 | Quantidade 0 remove o item | `alterarQuantidade` | `tests/unit/carrinho.test.ts`, E2E |
+| RN#15 | Carrinho do visitante salvo no navegador | `stores/carrinho.store.ts` | E2E "carrinho persiste ao recarregar" |
+| RN#16 | Totais recalculados sem recarregar | `calcularTotais` | `tests/unit/carrinho.test.ts`, E2E |
+| F4 (revalidação) | Preço/capacidade/inativos conferidos no servidor | `reconciliarCarrinho`, `controllers/carrinho.actions.ts` | `tests/unit/carrinho.test.ts` |
+| US-09 · CA#1 / RN#04, RN#17 | CEP na área mostra o frete | `models/domain/entrega.ts`, `controllers/entrega.actions.ts` | `tests/unit/entrega.test.ts`, E2E |
+| US-09 · CA#2 / RN#18 | Fora da área sugere retirada | `components/loja/checkout/campo-cep.tsx` | `tests/unit/entrega.test.ts`, E2E |
+| US-09 · CA#3 | Formato inválido sem consultar o banco | `campo-cep.tsx`, `cepValido` | `tests/unit/entrega.test.ts`, E2E |
+| US-09 · CA#4 | ViaCEP opcional com digitação manual | `campo-cep.tsx → buscarViaCEP` | Checklist manual |
+| US-02 · CA#2 / RN#05 | Nome, e-mail e telefone obrigatórios | `models/schemas/checkout.schema.ts` | `tests/unit/checkout-schema.test.ts`, E2E |
+| RN#20 | Retirada zera o frete | `calcularFrete`, `checkout-form.tsx` | `tests/unit/entrega.test.ts`, E2E |
+| RN#19 / RNF#19 | Datas antes da maior antecedência bloqueadas | `models/domain/agenda.ts`, `seletor-data.tsx` | `tests/unit/agenda.test.ts`, E2E |

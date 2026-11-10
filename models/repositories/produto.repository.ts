@@ -103,3 +103,10 @@ export function atualizarProduto(
 ) {
   return tx.produto.update({ where: { id }, data: dados })
 }
+
+export async function buscarProdutosAtivosPorIds(ids: number[]) {
+  const produtos = await db.produto.findMany({
+    where: { id: { in: ids }, ativo: true },
+  })
+  return comDisponibilidade(produtos)
+}

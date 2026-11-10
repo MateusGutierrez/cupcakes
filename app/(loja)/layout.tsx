@@ -2,6 +2,7 @@ import { Suspense } from "react"
 
 import { BottomNav } from "@/components/loja/bottom-nav"
 import { DemoBanner } from "@/components/loja/demo-banner"
+import { HidratarCarrinho } from "@/components/loja/hidratar-carrinho"
 import { SiteHeader } from "@/components/loja/site-header"
 
 export default function LojaLayout({
@@ -11,6 +12,7 @@ export default function LojaLayout({
 }) {
   return (
     <div className="flex min-h-svh flex-col">
+      <HidratarCarrinho />
       <DemoBanner />
       <SiteHeader />
       {/* Espaço extra no fim para o conteúdo não ficar atrás da BottomNav */}

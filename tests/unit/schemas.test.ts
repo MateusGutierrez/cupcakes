@@ -57,9 +57,15 @@ describe("produtoSchema (US-16)", () => {
   })
 
   it("rejeita preço zero ou negativo (RN#33, CA#3)", () => {
-    expect(errosDe({ ...valido, precoCentavos: "0" }).precoCentavos).toBeDefined()
-    expect(errosDe({ ...valido, precoCentavos: "-5" }).precoCentavos).toBeDefined()
-    expect(errosDe({ ...valido, precoCentavos: "abc" }).precoCentavos).toBeDefined()
+    expect(
+      errosDe({ ...valido, precoCentavos: "0" }).precoCentavos
+    ).toBeDefined()
+    expect(
+      errosDe({ ...valido, precoCentavos: "-5" }).precoCentavos
+    ).toBeDefined()
+    expect(
+      errosDe({ ...valido, precoCentavos: "abc" }).precoCentavos
+    ).toBeDefined()
   })
 
   it("exige alergênicos (RN#13)", () => {
@@ -74,9 +80,15 @@ describe("produtoSchema (US-16)", () => {
   })
 
   it("rejeita limite negativo e URL de imagem insegura", () => {
-    expect(errosDe({ ...valido, limiteDiario: "-1" }).limiteDiario).toBeDefined()
-    expect(errosDe({ ...valido, imagemUrl: "http://x.com/a.png" }).imagemUrl).toBeDefined()
-    expect(errosDe({ ...valido, imagemUrl: "javascript:alert(1)" }).imagemUrl).toBeDefined()
+    expect(
+      errosDe({ ...valido, limiteDiario: "-1" }).limiteDiario
+    ).toBeDefined()
+    expect(
+      errosDe({ ...valido, imagemUrl: "http://x.com/a.png" }).imagemUrl
+    ).toBeDefined()
+    expect(
+      errosDe({ ...valido, imagemUrl: "javascript:alert(1)" }).imagemUrl
+    ).toBeDefined()
   })
 })
 
@@ -89,10 +101,14 @@ describe("gerarSlug", () => {
 
 describe("loginSchema", () => {
   it("normaliza e-mail e exige senha", () => {
-    expect(loginSchema.parse({ email: " Admin@Cupcakes.dev ", senha: "x" }).email).toBe(
-      "admin@cupcakes.dev"
+    expect(
+      loginSchema.parse({ email: " Admin@Cupcakes.dev ", senha: "x" }).email
+    ).toBe("admin@cupcakes.dev")
+    expect(
+      loginSchema.safeParse({ email: "invalido", senha: "x" }).success
+    ).toBe(false)
+    expect(loginSchema.safeParse({ email: "a@b.com", senha: "" }).success).toBe(
+      false
     )
-    expect(loginSchema.safeParse({ email: "invalido", senha: "x" }).success).toBe(false)
-    expect(loginSchema.safeParse({ email: "a@b.com", senha: "" }).success).toBe(false)
   })
 })
