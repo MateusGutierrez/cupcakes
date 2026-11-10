@@ -11,7 +11,7 @@ Atualizada ao fim de cada feature.
 | US-03 · CA#4 | Erro com "Tentar novamente" | `app/(loja)/error.tsx` | Checklist manual |
 | RN#09 | Selos de restrição | `models/domain/catalogo.ts → selosDoProduto` | `tests/unit/catalogo.test.ts` |
 | RN#14 | Capacidade = limite − vendidos (cancelados não contam) | `models/domain/capacidade.ts`, `vendidosNoDia` | `tests/unit/capacidade.test.ts` |
-| US-05 · CA#1 / RN#12 | Busca ignora acentos e maiúsculas | `models/domain/catalogo.ts → filtrarCatalogo` | `tests/unit/catalogo.test.ts` |
+| US-05 · CA#1 / RN#12 | Busca ignora acentos e maiúsculas, tolera 1 erro por palavra, com debounce (RNF#12) | `models/domain/catalogo.ts → filtrarCatalogo`, `components/loja/busca-form.tsx` | `tests/unit/catalogo.test.ts`, E2E "busca enquanto digita" |
 | US-05 · CA#2 | "Nenhum produto encontrado" + limpar | `app/(loja)/page.tsx` | E2E `admin-produto.spec.ts` |
 | US-06 · CA#1 / RN#13 | Alergênicos sempre visíveis no detalhe | `app/(loja)/produto/[slug]/page.tsx` | Checklist manual |
 | US-06 · CA#3 | Botão desabilitado se indisponível | `components/loja/adicionar-ao-carrinho.tsx` | Checklist manual |
@@ -58,4 +58,7 @@ Atualizada ao fim de cada feature.
 | RN#29 | Cancelar pedido pago estorna (simulado) | `mudarStatusService` | `tests/integration/mudar-status.test.ts`, E2E |
 | RNF#31 | Auditoria das mudanças de status | `mudarStatusService → registrarAuditoria` | `tests/integration/mudar-status.test.ts` |
 | US-18 (impressão) | Comanda para a cozinha com `@media print` | `app/admin/(painel)/pedidos/[id]/imprimir/page.tsx` | E2E "comanda de impressão" |
+| US-14 · CA#1 / RNF#27 | Cliente cancela com confirmação explícita | `components/loja/cancelar-pedido-botao.tsx`, `controllers/pedido.actions.ts → cancelarPedidoCliente` | E2E "cliente cancela o pedido" |
+| US-14 · CA#2 / RN#28 | Cancelar só antes do preparo; servidor revalida | `mudarStatusService` | `tests/integration/mudar-status.test.ts`, E2E |
+| RNF#08 / DoD | Sem rolagem horizontal em 320px e 360px | todas as telas | E2E `mobile-320.spec.ts` |
 

@@ -256,16 +256,22 @@ Ordem pensada para que cada passo possa ser testado com o anterior.
 
 ### Fase 5 — Complementos, qualidade e entrega
 
+> ✅ **Concluída em 10/11/2026** (exceto deploy opcional e a gravação do vídeo, que dependem de você).
+> - Busca com debounce de 300ms e tolerância a 1 erro por palavra (Levenshtein).
+> - Cancelamento pelo cliente reaproveita o serviço de mudança de status; o histórico registra "Cliente" (auditoria é só da equipe).
+> - DoD em 320/360px virou teste automatizado (`e2e/mobile-320.spec.ts`) — achou e corrigiu 2px de sobra no carrinho.
+> - Testes E2E com banco próprio (`prisma/e2e.db`, recriado a cada execução) e pasta de build `.next-e2e`.
+
 | # | Tarefa | ⏱ |
 |---|---|---|
-| 5.1 | F3 Busca: `normalizar()` em `models/domain/busca.ts` + debounce + estado vazio 🧪 | 3h |
-| 5.2 | F10 Cancelar: AlertDialog, revalidação no servidor, estorno simulado 🧪 | 3h |
-| 5.3 | Passar a **Definition of Done** (seção 9) em todas as telas: 320px, 360px, estados de carregando/vazio/erro | 4h |
-| 5.4 | (Opcional) 2 testes E2E Playwright com viewport mobile | 4h |
-| 5.5 | `docs/modelo-dados.md` (diagrama Mermaid gerado do schema), `docs/manual.md`, `docs/rastreabilidade.md` | 4h |
-| 5.6 | README: como rodar, usuários de teste, prints mobile, print dos testes | 2h |
+| 5.1 | ✅  F3 Busca: `normalizar()` em `models/domain/busca.ts` + debounce + estado vazio 🧪 | 3h |
+| 5.2 | ✅  F10 Cancelar: AlertDialog, revalidação no servidor, estorno simulado 🧪 | 3h |
+| 5.3 | ✅  Passar a **Definition of Done** (seção 9) em todas as telas: 320px, 360px, estados de carregando/vazio/erro | 4h |
+| 5.4 | ✅  (Opcional) 2 testes E2E Playwright com viewport mobile | 4h |
+| 5.5 | ✅  `docs/modelo-dados.md` (diagrama Mermaid gerado do schema), `docs/manual.md`, `docs/rastreabilidade.md` | 4h |
+| 5.6 | ✅  README: como rodar, usuários de teste, prints mobile, print dos testes | 2h |
 | 5.7 | (Opcional) Deploy. **Atenção:** SQLite não persiste em hospedagem serverless (Vercel); usar Turso/PostgreSQL ou um host com disco (Railway, Fly) | 3h |
-| 5.8 | Roteiro e gravação do vídeo (≥ 5 min) | 3h |
+| 5.8 | ✅ roteiro pronto; gravação: você ·  Roteiro e gravação do vídeo (≥ 5 min) | 3h |
 
 ---
 
