@@ -28,6 +28,10 @@ const buttonVariants = cva(
         "icon-xs": "size-5 rounded-sm [&_svg:not([class*='size-'])]:size-2.5",
         "icon-sm": "size-6 [&_svg:not([class*='size-'])]:size-3",
         "icon-lg": "size-8 [&_svg:not([class*='size-'])]:size-4",
+        // Alvos de toque ≥ 44px para a loja mobile-first (plan.md, seção 4)
+        touch:
+          "h-11 gap-2 px-4 text-sm font-semibold has-data-[icon=inline-end]:pr-3 has-data-[icon=inline-start]:pl-3 [&_svg:not([class*='size-'])]:size-5",
+        "icon-touch": "size-11 [&_svg:not([class*='size-'])]:size-5",
       },
     },
     defaultVariants: {

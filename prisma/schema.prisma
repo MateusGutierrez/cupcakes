@@ -1,0 +1,159 @@
+// Modelo de dados — Cupcakes Gourmet (ver plan.md, seção 3)
+// Valores em dinheiro sempre em centavos (Int).
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+enum Papel {
+  ADMIN
+  ATENDENTE
+}
+
+enum Modalidade {
+  ENTREGA
+  RETIRADA
+}
+
+enum FormaPagamento {
+  CARTAO
+  PIX
+  DINHEIRO
+}
+
+enum StatusPagamento {
+  PENDENTE
+  APROVADO
+  NA_ENTREGA
+  ESTORNADO
+}
+
+enum StatusPedido {
+  AGUARDANDO_PAGAMENTO
+  RECEBIDO
+  EM_PREPARO
+  PRONTO
+  SAIU_PARA_ENTREGA
+  ENTREGUE
+  CANCELADO
+}
+
+model Produto {
+  id                Int      @id @default(autoincrement())
+  slug              String   @unique
+  nome              String
+  descricao         String
+  ingredientes      String
+  precoCentavos     Int
+  imagemUrl         String
+  alergenicos       String // RN#13: obrigatório
+  semGluten         Boolean  @default(false)
+  semLactose        Boolean  @default(false)
+  vegano            Boolean  @default(false)
+  limiteDiario      Int      @default(20) // RN#14
+  antecedenciaHoras Int      @default(0) // RN#19
+  ativo             Boolean  @default(false) // RN#35: nasce inativo
+  destaque          Boolean  @default(false)
+  colecao           String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  itens ItemPedido[]
+
+  @@index([ativo])
+}
+
+model AreaEntrega {
+  id            Int    @id @default(autoincrement())
+  nome          String
+  cepInicio     String // 8 dígitos, sem hífen
+  cepFim        String
+  freteCentavos Int
+}
+
+model Pedido {
+  id                Int             @id @default(autoincrement())
+  numero            String          @unique // RN#24: CG-000123
+  nomeCliente       String
+  email             String
+  telefone          String
+  modalidade        Modalidade
+  cep               String?
+  endereco          String?
+  dataAgendada      DateTime
+  subtotalCentavos  Int
+  freteCentavos     Int
+  totalCentavos     Int
+  formaPagamento    FormaPagamento
+  statusPagamento   StatusPagamento
+  cartaoFinal       String? // RNF#20: só os 4 últimos dígitos
+  trocoParaCentavos Int?
+  status            StatusPedido
+  observacao        String?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  itens     ItemPedido[]
+  historico HistoricoStatus[]
+
+  @@index([dataAgendada])
+  @@index([status])
+}
+
+model ItemPedido {
+  id                    Int     @id @default(autoincrement())
+  pedidoId              Int
+  produtoId             Int
+  nomeProduto           String // snapshot
+  precoUnitarioCentavos Int // snapshot
+  quantidade            Int
+  mensagem              String?
+
+  pedido  Pedido  @relation(fields: [pedidoId], references: [id], onDelete: Cascade)
+  produto Produto @relation(fields: [produtoId], references: [id])
+
+  @@index([pedidoId])
+  @@index([produtoId])
+}
+
+model HistoricoStatus {
+  id          Int           @id @default(autoincrement())
+  pedidoId    Int
+  de          StatusPedido?
+  para        StatusPedido
+  responsavel String // nome do usuário da equipe ou "cliente"/"sistema"
+  createdAt   DateTime      @default(now())
+
+  pedido Pedido @relation(fields: [pedidoId], references: [id], onDelete: Cascade)
+
+  @@index([pedidoId])
+}
+
+model Usuario {
+  id        Int      @id @default(autoincrement())
+  nome      String
+  email     String   @unique
+  senhaHash String
+  papel     Papel
+  createdAt DateTime @default(now())
+
+  logs LogAuditoria[]
+}
+
+model LogAuditoria {
+  id         Int      @id @default(autoincrement())
+  usuarioId  Int
+  acao       String
+  entidade   String
+  entidadeId String
+  createdAt  DateTime @default(now())
+
+  usuario Usuario @relation(fields: [usuarioId], references: [id])
+
+  @@index([entidade, entidadeId])
+}

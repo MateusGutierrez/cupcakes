@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" role="img" aria-label="Cupcake coco-vegano">
+<rect width="400" height="400" fill="#f2ede7"/>
+<circle cx="200" cy="215" r="150" fill="#ffffff" opacity=".12"/>
+<path d="M118 228h164l-22 112H140z" fill="#8a6a4f"/>
+<path d="M150 228l10 112M185 228l3 112M215 228l-3 112M250 228l-10 112" stroke="#000" stroke-opacity=".15" stroke-width="6"/>
+<path d="M108 232c-14-36 14-62 40-60-6-36 30-62 62-52 22-30 74-14 74 22 34 2 50 46 26 74-6 12-18 16-30 16H134c-12 0-22-4-26-0z" fill="#ffffff" stroke="#000" stroke-opacity=".08" stroke-width="4"/>
+<path d="M150 190c20 10 60 12 96-2" stroke="#fff" stroke-opacity=".5" stroke-width="8" fill="none" stroke-linecap="round"/>
+<circle cx="200" cy="108" r="16" fill="#c9b29b"/>
+<g fill="#c9b29b"><rect x="150" y="150" width="14" height="5" rx="2.5" transform="rotate(30 157 152)"/><rect x="236" y="160" width="14" height="5" rx="2.5" transform="rotate(-25 243 162)"/><rect x="190" y="200" width="14" height="5" rx="2.5" transform="rotate(70 197 202)"/><rect x="260" y="205" width="14" height="5" rx="2.5"/><rect x="128" y="208" width="14" height="5" rx="2.5" transform="rotate(-50 135 210)"/></g>
+</svg>

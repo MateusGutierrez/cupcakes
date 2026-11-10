@@ -12,7 +12,14 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Client gerado pelo Prisma
+    "generated/**",
   ]),
+  // Componentes gerados pelo shadcn: não são editados à mão
+  {
+    files: ["components/ui/**"],
+    rules: { "react-hooks/set-state-in-effect": "off" },
+  },
 ]);
 
 export default eslintConfig;

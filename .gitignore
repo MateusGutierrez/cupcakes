@@ -37,3 +37,18 @@ pnpm-debug.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+/generated/prisma
+!.env.example
+
+# banco SQLite local
+/prisma/*.db
+/prisma/*.db-journal
+.agents
+.claude
+.windsurf
+skills-lock.json
+
+# playwright
+/test-results/
+/playwright-report/
