@@ -21,8 +21,8 @@ export default async function PainelLayout({
   ]
 
   return (
-    <div className="flex min-h-svh flex-col bg-muted/30">
-      <header className="sticky top-0 z-40 border-b bg-background pt-[env(safe-area-inset-top)]">
+    <div className="flex min-h-svh flex-col bg-muted/30 print:bg-white">
+      <header className="sticky top-0 z-40 border-b bg-background pt-[env(safe-area-inset-top)] print:hidden">
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-2 px-4">
           <Link
             href="/admin"
@@ -53,7 +53,7 @@ export default async function PainelLayout({
           <AdminNav itens={itens} />
         </div>
       </header>
-      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
+      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-4 pb-[calc(1rem+env(safe-area-inset-bottom))] print:p-0">
         {children}
       </main>
     </div>

@@ -102,3 +102,37 @@ export function listarResumoPedidos(numeros: string[]) {
     orderBy: { createdAt: "desc" },
   })
 }
+
+/** Pedidos para o painel, por status, na ordem do horário agendado (RNF#32). */
+export function listarPedidosPorStatus(status: StatusPedido) {
+  return db.pedido.findMany({
+    where: { status },
+    include: {
+      itens: { orderBy: { id: "asc" } },
+      historico: { orderBy: { createdAt: "asc" } },
+    },
+    // Entregues/cancelados: mais recentes primeiro; demais: o próximo horário primeiro
+    orderBy: {
+      dataAgendada:
+        status === "ENTREGUE" || status === "CANCELADO" ? "desc" : "asc",
+    },
+    take: 100,
+  })
+}
+
+export async function contarPedidosPorStatus(): Promise<
+  Partial<Record<StatusPedido, number>>
+> {
+  const grupos = await db.pedido.groupBy({
+    by: ["status"],
+    _count: { _all: true },
+  })
+  return Object.fromEntries(grupos.map((g) => [g.status, g._count._all]))
+}
+
+export function buscarPedidoPorId(id: number) {
+  return db.pedido.findUnique({
+    where: { id },
+    include: { itens: { orderBy: { id: "asc" } } },
+  })
+}

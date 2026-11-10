@@ -228,9 +228,16 @@ Ordem pensada para que cada passo possa ser testado com o anterior.
 ### Fase 4 — Operação
 
 #### 4.1 F13 · Gestão de pedidos
-- [ ] `controllers/admin-pedido.actions.ts → avancarStatus(pedidoId)`: `exigirSessao` → `podeTransicionar` → atualiza + Historico (responsável) + LogAuditoria, em transação
-- [ ] Tabs por status, ordenadas por data agendada; botão "Avançar para: …"
-- [ ] `/admin/pedidos/[id]/imprimir` com `@media print`
+
+> ✅ **Concluída em 10/11/2026** — Fase 4 completa. Comprovada por `e2e/admin-pedidos.spec.ts` e `tests/integration/mudar-status.test.ts`. Observações:
+> - Abas por status são links (`?status=`), não o componente Tabs: funcionam sem JS e a aba fica na URL.
+> - A action recebe o status que o atendente estava vendo; se o pedido já mudou (outro atendente, clique duplo), a mudança é recusada.
+> - A equipe já pode cancelar (com confirmação e estorno simulado, RN#29). O cancelamento pelo cliente (F10) continua na Fase 5.
+> - PIX aguardando pode ser confirmado manualmente pela equipe ("Confirmar pagamento").
+> - A lista se atualiza a cada 30s para mostrar novos pedidos.
+- [x] `controllers/admin-pedido.actions.ts → avancarStatus(pedidoId)`: `exigirSessao` → `podeTransicionar` → atualiza + Historico (responsável) + LogAuditoria, em transação
+- [x] Tabs por status, ordenadas por data agendada; botão "Avançar para: …"
+- [x] `/admin/pedidos/[id]/imprimir` com `@media print`
 - 🧪 Integração `avancarStatus` (com e sem sessão)
 - ⏱ 6h · 💬 `feat(US-17): painel de pedidos com avanço de status`
 

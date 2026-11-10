@@ -51,4 +51,11 @@ Atualizada ao fim de cada feature.
 | US-13 · CA#3 | Convidado consulta com número + e-mail; e-mail errado não vaza dados | `controllers/pedido.actions.ts`, `buscarPedidoDoCliente` | `tests/integration/consultar-pedido.test.ts`, E2E |
 | US-13 · CA#4 | Pedido entregue aparece concluído | `linhaDoTempo` | `tests/unit/status.test.ts` |
 | RNF#24 (adaptada) | Atualização por polling a cada 20s | `components/loja/atualizacao-automatica.tsx` | Checklist manual |
+| US-17 · CA#1 / RNF#32 | Pedidos por status, ordenados pelo horário agendado | `app/admin/(painel)/pedidos/page.tsx`, `listarPedidosPorStatus` | E2E `admin-pedidos.spec.ts` |
+| US-17 · CA#2 | UI só oferece a próxima transição válida | `components/admin/acoes-pedido.tsx`, `proximoStatus` | `tests/unit/status.test.ts`, E2E |
+| US-17 · CA#3 / RN#27 | Histórico com responsável | `models/services/mudar-status.ts` | `tests/integration/mudar-status.test.ts`, E2E |
+| US-17 · CA#4 | Entregue/cancelado bloqueados | `mudarStatusService`, `podeTransicionar` | `tests/integration/mudar-status.test.ts`, E2E |
+| RN#29 | Cancelar pedido pago estorna (simulado) | `mudarStatusService` | `tests/integration/mudar-status.test.ts`, E2E |
+| RNF#31 | Auditoria das mudanças de status | `mudarStatusService → registrarAuditoria` | `tests/integration/mudar-status.test.ts` |
+| US-18 (impressão) | Comanda para a cozinha com `@media print` | `app/admin/(painel)/pedidos/[id]/imprimir/page.tsx` | E2E "comanda de impressão" |
 
