@@ -6,6 +6,7 @@ import QRCode from "qrcode"
 
 import { CopiarBotao } from "@/components/copiar-botao"
 import { AtualizacaoAutomatica } from "@/components/loja/atualizacao-automatica"
+import { CancelarPedidoBotao } from "@/components/loja/cancelar-pedido-botao"
 import { SimularPixBotao } from "@/components/loja/simular-pix-botao"
 import { StatusTimeline } from "@/components/loja/status-timeline"
 import { Badge } from "@/components/ui/badge"
@@ -20,7 +21,12 @@ import {
   ROTULO_MODALIDADE,
   ROTULO_STATUS_PAGAMENTO,
 } from "@/models/domain/rotulos"
-import { ehTerminal, linhaDoTempo, ROTULO_STATUS } from "@/models/domain/status"
+import {
+  ehTerminal,
+  linhaDoTempo,
+  podeCancelar,
+  ROTULO_STATUS,
+} from "@/models/domain/status"
 import { buscarPedidoPorNumero } from "@/models/repositories/pedido.repository"
 
 export async function generateMetadata({
@@ -274,6 +280,13 @@ export default async function PedidoPage({
       >
         Voltar à vitrine
       </Link>
+      {/* RN#28: botão só aparece antes do preparo; o servidor revalida */}
+      {podeCancelar(pedido.status) && (
+        <CancelarPedidoBotao
+          numero={pedido.numero}
+          estornara={pedido.statusPagamento === "APROVADO"}
+        />
+      )}
     </div>
   )
 }

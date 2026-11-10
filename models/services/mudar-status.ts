@@ -12,7 +12,8 @@ export type PedidoMudarStatus = {
   /** Status que a pessoa estava vendo na tela (evita avançar duas vezes). */
   de: StatusPedido
   para: StatusPedido
-  usuario: { id: number; nome: string }
+  /** Usuário da equipe, ou { cliente: true } quando o próprio cliente cancela (US-14). */
+  usuario: { id: number; nome: string } | { cliente: true }
 }
 
 export type ResultadoMudanca =
@@ -54,16 +55,30 @@ export async function mudarStatusService(
     if (para === "CANCELADO" && pedido.statusPagamento === "APROVADO")
       extra.statusPagamento = "ESTORNADO"
 
-    await registrarMudancaDeStatus(pedido, para, usuario.nome, extra, tx)
-    await registrarAuditoria(
-      {
-        usuarioId: usuario.id,
-        acao: para === "CANCELADO" ? "CANCELAR_PEDIDO" : `STATUS_${para}`,
-        entidade: "Pedido",
-        entidadeId: pedido.id,
-      },
+    const equipe = "id" in usuario
+    // O cliente só pode cancelar; avançar etapas é exclusivo da equipe
+    if (!equipe && para !== "CANCELADO")
+      return { ok: false, mensagem: "Ação não permitida." }
+
+    await registrarMudancaDeStatus(
+      pedido,
+      para,
+      equipe ? usuario.nome : "Cliente",
+      extra,
       tx
     )
+    // RNF#31: auditoria das ações da equipe
+    if (equipe) {
+      await registrarAuditoria(
+        {
+          usuarioId: usuario.id,
+          acao: para === "CANCELADO" ? "CANCELAR_PEDIDO" : `STATUS_${para}`,
+          entidade: "Pedido",
+          entidadeId: pedido.id,
+        },
+        tx
+      )
+    }
     return {
       ok: true,
       numero: pedido.numero,

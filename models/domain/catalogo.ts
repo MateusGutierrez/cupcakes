@@ -35,6 +35,46 @@ type Pesquisavel = ComSelos & {
   ingredientes: string
 }
 
+/** Distância de edição (inserções, remoções e trocas) entre duas palavras. */
+export function distanciaLevenshtein(a: string, b: string): number {
+  const anterior = Array.from({ length: b.length + 1 }, (_, i) => i)
+  for (let i = 1; i <= a.length; i++) {
+    let diagonal = anterior[0]
+    anterior[0] = i
+    for (let j = 1; j <= b.length; j++) {
+      const acima = anterior[j]
+      anterior[j] = Math.min(
+        anterior[j] + 1,
+        anterior[j - 1] + 1,
+        diagonal + (a[i - 1] === b[j - 1] ? 0 : 1)
+      )
+      diagonal = acima
+    }
+  }
+  return anterior[b.length]
+}
+
+/**
+ * Cada palavra buscada precisa aparecer no texto, ou estar a 1 letra de
+ * distância de alguma palavra dele (tolerância a erro de digitação, só para
+ * palavras com 4+ letras, para não gerar falsos positivos).
+ */
+export function correspondeBusca(
+  termoNormalizado: string,
+  textoNormalizado: string
+): boolean {
+  const palavrasTexto = textoNormalizado.split(/[^a-z0-9]+/).filter(Boolean)
+  return termoNormalizado
+    .split(" ")
+    .filter(Boolean)
+    .every(
+      (palavra) =>
+        textoNormalizado.includes(palavra) ||
+        (palavra.length >= 4 &&
+          palavrasTexto.some((p) => distanciaLevenshtein(palavra, p) <= 1))
+    )
+}
+
 /** Aplica filtro por selo e busca textual (nome, descrição ou ingredientes). */
 export function filtrarCatalogo<T extends Pesquisavel>(
   produtos: T[],
@@ -44,8 +84,9 @@ export function filtrarCatalogo<T extends Pesquisavel>(
   return produtos.filter((p) => {
     if (selo && !p[selo]) return false
     if (!termo) return true
-    return normalizar(`${p.nome} ${p.descricao} ${p.ingredientes}`).includes(
-      termo
+    return correspondeBusca(
+      termo,
+      normalizar(`${p.nome} ${p.descricao} ${p.ingredientes}`)
     )
   })
 }

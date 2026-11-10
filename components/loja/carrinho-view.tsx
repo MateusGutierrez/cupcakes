@@ -56,7 +56,7 @@ export function CarrinhoView() {
           >
             <Link
               href={`/produto/${i.slug}`}
-              className="w-20 shrink-0 overflow-hidden rounded-lg"
+              className="w-16 shrink-0 self-start overflow-hidden rounded-lg sm:w-20"
             >
               <ProdutoImagem src={i.imagemUrl} alt={i.nome} sizes="80px" />
             </Link>
@@ -83,7 +83,7 @@ export function CarrinhoView() {
                   <Trash2Icon />
                 </Button>
               </div>
-              <div className="flex items-center justify-between gap-2">
+              <div className="flex flex-wrap items-center justify-between gap-2">
                 <QuantidadeStepper
                   valor={i.quantidade}
                   min={0}

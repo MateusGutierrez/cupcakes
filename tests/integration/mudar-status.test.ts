@@ -179,3 +179,57 @@ describe("avancarStatus (US-17)", () => {
     })
   })
 })
+
+describe("cancelar pelo cliente (US-14)", () => {
+  it("cancela em RECEBIDO, registra 'Cliente' no histórico e estorna (RN#27, RN#29)", async () => {
+    const r = await mudarStatusService(
+      {
+        pedidoId,
+        de: "RECEBIDO",
+        para: "CANCELADO",
+        usuario: { cliente: true },
+      },
+      banco.db
+    )
+    expect(r.ok).toBe(true)
+    const pedido = await banco.db.pedido.findUniqueOrThrow({
+      where: { id: pedidoId },
+      include: { historico: true },
+    })
+    expect(pedido).toMatchObject({
+      status: "CANCELADO",
+      statusPagamento: "ESTORNADO",
+    })
+    expect(pedido.historico.at(-1)?.responsavel).toBe("Cliente")
+  })
+
+  it("não cancela depois que o preparo começou (US-14 CA#2)", async () => {
+    await mudarStatusService(
+      { pedidoId, de: "RECEBIDO", para: "EM_PREPARO", usuario },
+      banco.db
+    )
+    const r = await mudarStatusService(
+      {
+        pedidoId,
+        de: "EM_PREPARO",
+        para: "CANCELADO",
+        usuario: { cliente: true },
+      },
+      banco.db
+    )
+    expect(r.ok).toBe(false)
+  })
+
+  it("cliente não consegue avançar etapas", async () => {
+    const r = await mudarStatusService(
+      {
+        pedidoId,
+        de: "RECEBIDO",
+        para: "EM_PREPARO",
+        usuario: { cliente: true },
+      },
+      banco.db
+    )
+    expect(r.ok).toBe(false)
+  })
+})
