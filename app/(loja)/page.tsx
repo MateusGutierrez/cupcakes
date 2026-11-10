@@ -1,19 +1,99 @@
-import { Button } from "@/components/ui/button"
+import { SearchXIcon } from "lucide-react"
+import Link from "next/link"
 
-export default function Page() {
+import { BuscaForm } from "@/components/loja/busca-form"
+import { ColecaoCarousel } from "@/components/loja/colecao-carousel"
+import { FiltroSelos } from "@/components/loja/filtro-selos"
+import { ProductCard } from "@/components/loja/product-card"
+import { buttonVariants } from "@/components/ui/button"
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty"
+import { filtrarCatalogo, isSelo } from "@/models/domain/catalogo"
+import { listarProdutosAtivos } from "@/models/repositories/produto.repository"
+
+function rotuloResultados(n: number) {
+  if (n === 0) return "Nenhum resultado"
+  return n === 1 ? "1 resultado" : `${n} resultados`
+}
+
+// US-03 — Vitrine
+export default async function VitrinePage({ searchParams }: PageProps<"/">) {
+  const sp = await searchParams
+  const buscando = "busca" in sp
+  const busca = typeof sp.busca === "string" ? sp.busca.trim() : ""
+  const selo = isSelo(sp.selo) ? sp.selo : undefined
+
+  const todos = await listarProdutosAtivos()
+  const produtos = filtrarCatalogo(todos, { selo, busca })
+  const filtrando = Boolean(busca || selo)
+
+  // Coleção sazonal: primeiro nome de coleção entre os produtos ativos
+  const nomeColecao = todos.find((p) => p.colecao)?.colecao
+  const colecao = nomeColecao
+    ? todos.filter((p) => p.colecao === nomeColecao)
+    : []
+
   return (
-    <div className="flex min-h-svh p-6">
-      <div className="flex max-w-md min-w-0 flex-col gap-4 text-sm leading-loose">
-        <div>
-          <h1 className="font-medium">Project ready!</h1>
-          <p>You may now add components and start building.</p>
-          <p>We&apos;ve already added the button component for you.</p>
-          <Button className="mt-2">Button</Button>
-        </div>
-        <div className="font-mono text-xs text-muted-foreground">
-          (Press <kbd>d</kbd> to toggle dark mode)
-        </div>
+    <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-3">
+        <BuscaForm busca={busca} selo={selo} focar={buscando && !busca} />
+        <FiltroSelos seloAtivo={selo} busca={busca} />
       </div>
+
+      {!filtrando && nomeColecao && (
+        <ColecaoCarousel nome={nomeColecao} produtos={colecao} />
+      )}
+
+      <section
+        aria-labelledby="titulo-catalogo"
+        className="flex flex-col gap-3"
+      >
+        <h1 id="titulo-catalogo" className="font-heading text-xl font-bold">
+          {filtrando ? rotuloResultados(produtos.length) : "Nossos cupcakes"}
+        </h1>
+
+        {produtos.length > 0 ? (
+          <ul className="grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-4 lg:grid-cols-4">
+            {produtos.map((p) => (
+              <li key={p.id}>
+                <ProductCard produto={p} />
+              </li>
+            ))}
+          </ul>
+        ) : (
+          // US-05 CA#2
+          <Empty className="border">
+            <EmptyHeader>
+              <EmptyMedia variant="icon">
+                <SearchXIcon />
+              </EmptyMedia>
+              <EmptyTitle>Nenhum produto encontrado</EmptyTitle>
+              <EmptyDescription>
+                {busca
+                  ? `Não achamos nada para “${busca}”.`
+                  : "Nenhum cupcake com esse filtro hoje."}
+              </EmptyDescription>
+            </EmptyHeader>
+            <EmptyContent>
+              <Link
+                href="/"
+                className={buttonVariants({
+                  size: "touch",
+                  variant: "outline",
+                })}
+              >
+                Limpar filtros
+              </Link>
+            </EmptyContent>
+          </Empty>
+        )}
+      </section>
     </div>
   )
 }
