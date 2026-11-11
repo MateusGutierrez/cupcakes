@@ -18,13 +18,17 @@ export function useRevalidarCarrinho() {
   useEffect(() => {
     if (!hidratado || feito.current) return
     feito.current = true
-    const { itens, substituir } = useCarrinho.getState()
-    if (itens.length === 0) return
-    revalidarCarrinho(itens)
-      .then((r) => {
-        substituir(r.itens)
-        r.avisos.forEach((a) => toast.warning(a))
-      })
+    async function conferir() {
+      const enviados = useCarrinho.getState().itens
+      if (enviados.length === 0) return
+      const r = await revalidarCarrinho(enviados)
+      // Se a pessoa mexeu no carrinho enquanto esperava, a resposta está
+      // desatualizada: confere de novo com o estado atual em vez de sobrescrever.
+      if (useCarrinho.getState().itens !== enviados) return conferir()
+      useCarrinho.getState().substituir(r.itens)
+      r.avisos.forEach((a) => toast.warning(a))
+    }
+    conferir()
       .catch(() => toast.error("Não foi possível conferir o carrinho agora."))
       .finally(() => setConferindo(false))
   }, [hidratado])
