@@ -85,7 +85,7 @@ export default async function VitrinePage({ searchParams }: PageProps<"/">) {
                 <SearchXIcon />
               </EmptyMedia>
               <EmptyTitle>Nenhum produto encontrado</EmptyTitle>
-              <EmptyDescription className="[overflow-wrap:anywhere] break-words">
+              <EmptyDescription className="wrap-anywhere">
                 {busca
                   ? `Não achamos nada para “${busca}”.`
                   : "Nenhum cupcake com esse filtro hoje."}

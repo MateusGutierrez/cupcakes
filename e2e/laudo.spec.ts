@@ -59,10 +59,10 @@ for (const largura of [1280, 320]) {
     // O servidor também corta o termo
     expect((await campo.inputValue()).length).toBe(60)
 
-    const largo = await page.evaluate(
-      () => document.documentElement.scrollWidth - window.innerWidth
+    const larguraPagina = await page.evaluate(
+      () => document.documentElement.scrollWidth
     )
-    expect(largo).toBeLessThanOrEqual(0)
+    expect(larguraPagina).toBeLessThanOrEqual(largura)
   })
 }
 

@@ -5,10 +5,12 @@ import { expect, type Page, test } from "@playwright/test"
 async function semRolagemHorizontal(page: Page, rota: string) {
   await page.goto(rota)
   await page.waitForLoadState("networkidle")
-  const { largura, visivel } = await page.evaluate(() => ({
-    largura: document.documentElement.scrollWidth,
-    visivel: document.documentElement.clientWidth,
-  }))
+  // Compara com a largura configurada: no modo celular o navegador alarga
+  // clientWidth junto com o conteúdo e esconderia o estouro.
+  const visivel = page.viewportSize()!.width
+  const largura = await page.evaluate(
+    () => document.documentElement.scrollWidth
+  )
   expect(
     largura,
     `${rota} tem rolagem horizontal (${largura}px > ${visivel}px)`
