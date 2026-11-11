@@ -71,9 +71,10 @@ export default async function VitrinePage({ searchParams }: PageProps<"/">) {
 
         {produtos.length > 0 ? (
           <ul className="grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-4 lg:grid-cols-4">
-            {produtos.map((p) => (
+            {produtos.map((p, i) => (
               <li key={p.id}>
-                <ProductCard produto={p} />
+                {/* As 2 primeiras fotos aparecem logo no celular: carregam primeiro (LCP) */}
+                <ProductCard produto={p} titulo="h2" preload={i < 2} />
               </li>
             ))}
           </ul>
