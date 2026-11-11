@@ -314,3 +314,21 @@ Se faltar tempo, cortar nesta ordem: E2E → deploy → ViaCEP → busca toleran
 4. View no celular (360px); depois expandir com `md:`/`lg:`
 5. Estados de carregando, vazio e erro
 6. Conferir a Definition of Done → atualizar `rastreabilidade.md` → commit com o ID da história
+
+---
+
+## 6. Fase 6 — Correções do teste com usuários
+
+Origem: [`laudo-qualidade.md`](laudo-qualidade.md) (testes de 10 e 11/11/2026). A ordem segue a severidade. Cada item fecha com teste automatizado, captura "depois" no laudo e um commit próprio.
+
+| # | Item | O que fazer | Teste | Estimativa |
+|---|---|---|---|---|
+| 6.1 | **D2** Domingo aceito (alta) | Regra `DIAS_FECHADOS` (domingo) em `models/domain/agenda.ts`, aplicada em `horariosDisponiveis` e `janelaDeDatas`, e portanto em `dataPermitida` no servidor. O calendário desabilita os domingos. O aviso da loja (`lib/loja.ts`) passa a ler a mesma regra. Vale para entrega e retirada (a cozinha não abre). | Unitário: domingo rejeitado e primeira data pula o domingo. Integração: `finalizarPedidoService` recusa domingo. E2E: domingo desabilitado. | 1,5h |
+| 6.2 | **D1** Limpar filtros | Em `busca-form.tsx`, sincronizar o campo com o termo da URL sempre que ele mudar por navegação externa ("Limpar filtros", "Vitrine", voltar), sem atrapalhar quem está digitando | E2E: buscar → Limpar filtros → campo vazio; voltar restaura o termo | 1h |
+| 6.3 | **D3** Busca longa | `BUSCA_MAX = 60` em `catalogo.ts`. Campo com `maxLength`. A página corta o parâmetro antes de filtrar. A mensagem mostra o termo com reticências e `break-words`. | Unitário: corte do termo. E2E: `?busca=` com 5.000 letras sem rolagem horizontal em 1.280 px e 320 px. | 1h |
+| 6.4 | **M1** Sugestões na busca | `sugerirProdutos(termo, produtos)` no domínio, com os 3 nomes mais próximos. Busca por início de palavra ("cho" → Chocolate). Tolerância de 2 erros em palavras com 8+ letras. Bloco "Você quis dizer…" no estado vazio. | Unitário: casos com erro, prefixo e termo sem relação. E2E: sugestão clicável. | 2h |
+| 6.5 | **M2** Fotos | Fotos com licença livre (Unsplash/Pexels), crédito em `docs/creditos-imagens.md`, WebP em `public/produtos/`, seed atualizado | Prints atualizados | 1,5h |
+| 6.6 | Evidências | Prints de responsividade (390, 768 e 1.280 px). Lighthouse mobile e desktop na URL da Vercel. Capturas "depois" de D1 a D3. Status final no laudo. | — | 1h |
+
+**Total estimado:** ~8h.
+**Critério de pronto:** typecheck, lint, `pnpm test` e `pnpm test:e2e` passando; laudo com todos os itens "Corrigido" e as evidências anexadas.
