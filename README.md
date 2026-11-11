@@ -107,10 +107,10 @@ O seed inclui casos para demonstração: Pistache com limite diário 0 (indispon
 ```
 $ pnpm test
  Test Files  13 passed (13)
-      Tests  127 passed (127)
+      Tests  136 passed (136)
 
 $ pnpm test:e2e
-  19 passed (29.2s)
+  24 passed (40.5s)
 ```
 
 - **Unitários** (`tests/unit/`): todas as regras de `models/domain/` — capacidade, carrinho, entrega/frete, agenda, pagamento, máquina de estados, busca, schemas.

@@ -317,7 +317,7 @@ Se faltar tempo, cortar nesta ordem: E2E → deploy → ViaCEP → busca toleran
 
 ---
 
-## 6. Fase 6 — Correções do teste com usuários
+## 6. Fase 6 — Correções do teste com usuários ✅
 
 Origem: [`laudo-qualidade.md`](laudo-qualidade.md) (testes de 10 e 11/11/2026). A ordem segue a severidade. Cada item fecha com teste automatizado, captura "depois" no laudo e um commit próprio.
 
@@ -332,3 +332,5 @@ Origem: [`laudo-qualidade.md`](laudo-qualidade.md) (testes de 10 e 11/11/2026). 
 
 **Total estimado:** ~8h.
 **Critério de pronto:** typecheck, lint, `pnpm test` e `pnpm test:e2e` passando; laudo com todos os itens "Corrigido" e as evidências anexadas.
+
+**Resultado (11/11/2026):** todos os itens concluídos. O domingo fechado vale para entrega e retirada. Também foram corrigidos um defeito de corrida na conferência do carrinho (D4) e três apontamentos do Lighthouse. Detalhes e evidências no [laudo](laudo-qualidade.md).
