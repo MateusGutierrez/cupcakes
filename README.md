@@ -124,6 +124,8 @@ A ligação entre cada critério de aceite e o teste que o comprova está em [`d
 - [`docs/manual.md`](docs/manual.md) — manual de uso (cliente e equipe)
 - [`docs/modelo-dados.md`](docs/modelo-dados.md) — diagrama, dicionário de dados e máquina de estados
 - [`docs/rastreabilidade.md`](docs/rastreabilidade.md) — matriz história/regra → código → teste
+- [`docs/laudo-qualidade.md`](docs/laudo-qualidade.md) — laudo do teste com usuários, defeitos e correções
+- [`docs/creditos-imagens.md`](docs/creditos-imagens.md) — autoria e licença das fotos dos produtos
 - [`docs/plano-acao.md`](docs/plano-acao.md) — plano de desenvolvimento e decisões tomadas
 - [`docs/roteiro-video.md`](docs/roteiro-video.md) — roteiro do vídeo de demonstração
 

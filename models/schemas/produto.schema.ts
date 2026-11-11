@@ -20,7 +20,7 @@ const inteiro = (min: number, max: number, rotulo: string) =>
     .min(min, { error: `${rotulo}: mínimo ${min}` })
     .max(max, { error: `${rotulo}: máximo ${max}` })
 
-export const IMAGEM_PADRAO = "/produtos/padrao.svg"
+export const IMAGEM_PADRAO = "/produtos/padrao.webp"
 
 export const produtoSchema = z.object({
   nome: z.string().trim().min(2, { error: "Informe o nome" }).max(80),

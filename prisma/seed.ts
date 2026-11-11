@@ -198,7 +198,7 @@ async function main() {
     await db.produto.create({
       data: {
         ...p,
-        imagemUrl: `/produtos/${p.slug}.svg`,
+        imagemUrl: `/produtos/${p.slug}.webp`,
         ativo: p.ativo ?? true,
       },
     })
@@ -206,7 +206,7 @@ async function main() {
   await db.produto.create({
     data: {
       ...produtoInativo,
-      imagemUrl: `/produtos/${produtoInativo.slug}.svg`,
+      imagemUrl: `/produtos/${produtoInativo.slug}.webp`,
     },
   })
 
