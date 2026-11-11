@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation"
 import { useEffect, useRef, useTransition } from "react"
 
 import { Input } from "@/components/ui/input"
-import type { Selo } from "@/models/domain/catalogo"
+import { BUSCA_MAX, type Selo } from "@/models/domain/catalogo"
 
 type Props = {
   busca?: string
@@ -31,6 +31,8 @@ export function BuscaForm({ busca, selo, focar }: Props) {
   const router = useRouter()
   const ref = useRef<HTMLInputElement>(null)
   const espera = useRef<ReturnType<typeof setTimeout>>(undefined)
+  /** Último termo que este campo mandou para a URL. */
+  const enviado = useRef(busca ?? "")
   const [buscando, iniciar] = useTransition()
 
   useEffect(() => {
@@ -39,11 +41,22 @@ export function BuscaForm({ busca, selo, focar }: Props) {
 
   useEffect(() => () => clearTimeout(espera.current), [])
 
+  // O termo mudou por fora ("Limpar filtros", "Vitrine", botão voltar):
+  // o campo acompanha a URL. Mudanças feitas pela própria digitação são ignoradas.
+  useEffect(() => {
+    const termo = busca ?? ""
+    if (termo === enviado.current || !ref.current) return
+    clearTimeout(espera.current)
+    ref.current.value = termo
+    enviado.current = termo
+  }, [busca])
+
   function aoDigitar(valor: string) {
     clearTimeout(espera.current)
     espera.current = setTimeout(() => {
+      enviado.current = valor.trim()
       iniciar(() =>
-        router.replace(urlDaBusca(valor.trim(), selo), { scroll: false })
+        router.replace(urlDaBusca(enviado.current, selo), { scroll: false })
       )
     }, ESPERA_MS)
   }
@@ -67,6 +80,7 @@ export function BuscaForm({ busca, selo, focar }: Props) {
         inputMode="search"
         enterKeyHint="search"
         autoComplete="off"
+        maxLength={BUSCA_MAX}
         placeholder="Buscar por nome ou sabor"
         defaultValue={busca}
         onChange={(e) => aoDigitar(e.target.value)}

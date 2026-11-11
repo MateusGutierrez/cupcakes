@@ -54,10 +54,27 @@ export function distanciaLevenshtein(a: string, b: string): number {
   return anterior[b.length]
 }
 
+/** Tamanho máximo do termo de busca (campo e servidor). */
+export const BUSCA_MAX = 60
+
+/** Lê o termo vindo da URL: só texto, sem espaços nas pontas e no máximo BUSCA_MAX letras. */
+export function termoDeBusca(valor: unknown): string {
+  if (typeof valor !== "string") return ""
+  return valor.trim().slice(0, BUSCA_MAX).trim()
+}
+
+/** Quantas letras erradas a busca tolera numa palavra, conforme o tamanho dela. */
+function tolerancia(palavra: string): number {
+  if (palavra.length >= 8) return 2
+  if (palavra.length >= 4) return 1
+  return 0
+}
+
 /**
- * Cada palavra buscada precisa aparecer no texto, ou estar a 1 letra de
- * distância de alguma palavra dele (tolerância a erro de digitação, só para
- * palavras com 4+ letras, para não gerar falsos positivos).
+ * Cada palavra buscada precisa aparecer no texto (inclusive como começo de
+ * palavra: "cho" → "chocolate") ou estar perto de alguma palavra dele:
+ * 1 letra de diferença para palavras de 4 a 7 letras, 2 para 8 ou mais.
+ * Palavras curtas não têm tolerância, para não gerar falsos positivos.
  */
 export function correspondeBusca(
   termoNormalizado: string,
@@ -70,8 +87,10 @@ export function correspondeBusca(
     .every(
       (palavra) =>
         textoNormalizado.includes(palavra) ||
-        (palavra.length >= 4 &&
-          palavrasTexto.some((p) => distanciaLevenshtein(palavra, p) <= 1))
+        (tolerancia(palavra) > 0 &&
+          palavrasTexto.some(
+            (p) => distanciaLevenshtein(palavra, p) <= tolerancia(palavra)
+          ))
     )
 }
 
@@ -89,6 +108,49 @@ export function filtrarCatalogo<T extends Pesquisavel>(
       normalizar(`${p.nome} ${p.descricao} ${p.ingredientes}`)
     )
   })
+}
+
+/**
+ * "Você quis dizer…": quando a busca não acha nada, sugere até `limite`
+ * produtos cujo nome mais se parece com o termo. Compara cada palavra
+ * buscada (3+ letras) com as palavras do nome e com o começo delas;
+ * só sugere se a diferença total for no máximo 40% das letras buscadas.
+ */
+export function sugerirProdutos<T extends { nome: string }>(
+  termo: string,
+  produtos: T[],
+  limite = 3
+): T[] {
+  const palavras = normalizar(termo)
+    .split(/[^a-z0-9]+/)
+    .filter((p) => p.length >= 3)
+  if (palavras.length === 0) return []
+  const letras = palavras.reduce((soma, p) => soma + p.length, 0)
+
+  return produtos
+    .map((produto) => {
+      const doNome = normalizar(produto.nome)
+        .split(/[^a-z0-9]+/)
+        .filter(Boolean)
+      const diferenca = palavras.reduce(
+        (soma, buscada) =>
+          soma +
+          Math.min(
+            ...doNome.map((w) =>
+              Math.min(
+                distanciaLevenshtein(buscada, w),
+                distanciaLevenshtein(buscada, w.slice(0, buscada.length))
+              )
+            )
+          ),
+        0
+      )
+      return { produto, nota: diferenca / letras }
+    })
+    .filter((s) => s.nota <= 0.4)
+    .sort((a, b) => a.nota - b.nota)
+    .slice(0, limite)
+    .map((s) => s.produto)
 }
 
 /** "Morango com Champagne!" → "morango-com-champagne" */

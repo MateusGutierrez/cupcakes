@@ -14,7 +14,12 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@/components/ui/empty"
-import { filtrarCatalogo, isSelo } from "@/models/domain/catalogo"
+import {
+  filtrarCatalogo,
+  isSelo,
+  sugerirProdutos,
+  termoDeBusca,
+} from "@/models/domain/catalogo"
 import { listarProdutosAtivos } from "@/models/repositories/produto.repository"
 
 function rotuloResultados(n: number) {
@@ -26,12 +31,18 @@ function rotuloResultados(n: number) {
 export default async function VitrinePage({ searchParams }: PageProps<"/">) {
   const sp = await searchParams
   const buscando = "busca" in sp
-  const busca = typeof sp.busca === "string" ? sp.busca.trim() : ""
+  // Termo limitado também no servidor (laudo D3): a URL aceita qualquer tamanho
+  const busca = termoDeBusca(sp.busca)
   const selo = isSelo(sp.selo) ? sp.selo : undefined
 
   const todos = await listarProdutosAtivos()
   const produtos = filtrarCatalogo(todos, { selo, busca })
   const filtrando = Boolean(busca || selo)
+  // "Você quis dizer…" só quando a busca não acha nada (laudo M1)
+  const sugestoes =
+    busca && produtos.length === 0
+      ? sugerirProdutos(busca, filtrarCatalogo(todos, { selo }))
+      : []
 
   // Coleção sazonal: primeiro nome de coleção entre os produtos ativos
   const nomeColecao = todos.find((p) => p.colecao)?.colecao
@@ -74,13 +85,33 @@ export default async function VitrinePage({ searchParams }: PageProps<"/">) {
                 <SearchXIcon />
               </EmptyMedia>
               <EmptyTitle>Nenhum produto encontrado</EmptyTitle>
-              <EmptyDescription>
+              <EmptyDescription className="[overflow-wrap:anywhere] break-words">
                 {busca
                   ? `Não achamos nada para “${busca}”.`
                   : "Nenhum cupcake com esse filtro hoje."}
               </EmptyDescription>
             </EmptyHeader>
             <EmptyContent>
+              {sugestoes.length > 0 && (
+                <nav aria-label="Sugestões" className="flex flex-col gap-2">
+                  <p className="text-sm font-medium">Você quis dizer:</p>
+                  <ul className="flex flex-wrap justify-center gap-2">
+                    {sugestoes.map((p) => (
+                      <li key={p.id}>
+                        <Link
+                          href={`/produto/${p.slug}`}
+                          className={buttonVariants({
+                            size: "touch",
+                            variant: "secondary",
+                          })}
+                        >
+                          {p.nome}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </nav>
+              )}
               <Link
                 href="/"
                 className={buttonVariants({

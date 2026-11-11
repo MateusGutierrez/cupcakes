@@ -5,8 +5,11 @@ import {
   distanciaLevenshtein,
   filtrarCatalogo,
   isSelo,
+  BUSCA_MAX,
   normalizar,
   selosDoProduto,
+  sugerirProdutos,
+  termoDeBusca,
 } from "@/models/domain/catalogo"
 
 const base = {
@@ -96,5 +99,55 @@ describe("busca tolerante a erro de digitação (US-05)", () => {
 
   it("palavras curtas não usam tolerância (evita falso positivo)", () => {
     expect(correspondeBusca("cox", "coco vegano")).toBe(false)
+  })
+})
+
+describe("termoDeBusca (laudo D3)", () => {
+  it("corta termos longos e ignora valores que não são texto", () => {
+    expect(termoDeBusca("a".repeat(5000))).toHaveLength(BUSCA_MAX)
+    expect(termoDeBusca("  pistache  ")).toBe("pistache")
+    expect(termoDeBusca(["a", "b"])).toBe("")
+    expect(termoDeBusca(undefined)).toBe("")
+  })
+})
+
+describe("busca mais tolerante (laudo M1)", () => {
+  it("começo de palavra encontra o produto", () => {
+    expect(correspondeBusca("cho", "chocolate belga")).toBe(true)
+  })
+
+  it("palavras com 8+ letras aceitam 2 letras erradas", () => {
+    expect(correspondeBusca("brigaderio", "cenoura com brigadeiro")).toBe(true)
+    expect(correspondeBusca("siciliana", "limao siciliano")).toBe(true)
+    // 7 letras continuam com 1 erro só
+    expect(correspondeBusca("pitaxe", "pistache")).toBe(false)
+  })
+})
+
+describe("sugerirProdutos — Você quis dizer… (laudo M1)", () => {
+  const cardapio = [
+    { nome: "Pistache" },
+    { nome: "Chocolate Belga" },
+    { nome: "Morango com Champagne" },
+    { nome: "Red Velvet" },
+  ]
+  const nomes = (termo: string) =>
+    sugerirProdutos(termo, cardapio).map((p) => p.nome)
+
+  it("sugere o nome mais parecido", () => {
+    expect(nomes("pistaxio")[0]).toBe("Pistache")
+    expect(nomes("xocolate")[0]).toBe("Chocolate Belga")
+    expect(nomes("morengo")[0]).toBe("Morango com Champagne")
+  })
+
+  it("não sugere nada sem relação ou com termo curto", () => {
+    expect(nomes("bolo de fuba")).toEqual([])
+    expect(nomes("zz")).toEqual([])
+    expect(nomes("")).toEqual([])
+  })
+
+  it("limita a quantidade de sugestões", () => {
+    expect(sugerirProdutos("a", cardapio)).toHaveLength(0)
+    expect(sugerirProdutos("re", cardapio, 1).length).toBeLessThanOrEqual(1)
   })
 })
