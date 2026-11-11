@@ -231,6 +231,17 @@ describe("finalizarPedido (US-12)", () => {
     expect(r).toMatchObject({ ok: false, campo: "data" })
   })
 
+  it("recusa retirada no domingo, quando a loja está fechada", async () => {
+    // 15/11/2026 é domingo (pedido CG-000004 do laudo, D2)
+    const r = await finalizarPedidoService(
+      { ...retiradaPix, data: "2026-11-15", horario: "18:00" },
+      [{ produtoId: idRedVelvet, quantidade: 1 }],
+      AGORA,
+      db
+    )
+    expect(r).toMatchObject({ ok: false, campo: "data" })
+  })
+
   it("recusa produto inativo", async () => {
     await db.produto.update({
       where: { id: idRedVelvet },

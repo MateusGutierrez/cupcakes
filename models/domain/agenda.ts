@@ -9,6 +9,8 @@ export type Horario = (typeof HORARIOS)[number]
 export const PREPARO_MINIMO_HORAS = 2
 /** Até quantos dias à frente é possível agendar. */
 export const JANELA_DIAS = 30
+/** Dias da semana em que a loja não abre (0 = domingo): sem entrega nem retirada. */
+export const DIAS_FECHADOS: readonly number[] = [0]
 
 const HORA_MS = 60 * 60 * 1000
 const DIA_MS = 24 * HORA_MS
@@ -30,11 +32,21 @@ export function limiteMinimo(agora: Date, antecedenciaHoras: number): Date {
   )
 }
 
+/** Dia da semana (0 = domingo) de um dia "AAAA-MM-DD". */
+export function diaDaSemana(dia: string): number {
+  return new Date(`${dia}T12:00:00Z`).getUTCDay()
+}
+
+export function lojaAberta(dia: string): boolean {
+  return !DIAS_FECHADOS.includes(diaDaSemana(dia))
+}
+
 export function horariosDisponiveis(
   dia: string,
   agora: Date,
   antecedenciaHoras: number
 ): Horario[] {
+  if (!lojaAberta(dia)) return []
   const limite = limiteMinimo(agora, antecedenciaHoras)
   return HORARIOS.filter((h) => instanteAgendado(dia, h) >= limite)
 }

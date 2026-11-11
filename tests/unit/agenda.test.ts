@@ -2,9 +2,11 @@ import { describe, expect, it } from "vitest"
 
 import {
   dataPermitida,
+  diaDaSemana,
   horariosDisponiveis,
   instanteAgendado,
   janelaDeDatas,
+  lojaAberta,
   somarDias,
 } from "@/models/domain/agenda"
 
@@ -50,6 +52,23 @@ describe("agenda (RN#19)", () => {
     expect(dataPermitida("2026-11-10", "14:00", agora, 0)).toBe(true)
     expect(dataPermitida(somarDias("2026-11-10", 31), "14:00", agora, 0)).toBe(
       false
+    )
+  })
+
+  it("domingo: loja fechada, sem horários e rejeitado no servidor", () => {
+    // 15/11/2026 é domingo
+    expect(diaDaSemana("2026-11-15")).toBe(0)
+    expect(lojaAberta("2026-11-15")).toBe(false)
+    expect(lojaAberta("2026-11-14")).toBe(true)
+    expect(horariosDisponiveis("2026-11-15", agora, 0)).toEqual([])
+    expect(dataPermitida("2026-11-15", "18:00", agora, 0)).toBe(false)
+    expect(dataPermitida("2026-11-16", "18:00", agora, 0)).toBe(true)
+  })
+
+  it("janela pula o domingo", () => {
+    // Sábado 14/11 às 17:00 (20:00 UTC): sábado acabou, domingo fechado → segunda
+    expect(janelaDeDatas(new Date("2026-11-14T20:00:00Z"), 0).primeiro).toBe(
+      "2026-11-16"
     )
   })
 

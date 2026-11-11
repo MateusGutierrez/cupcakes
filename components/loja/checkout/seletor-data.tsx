@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import {
   Field,
+  FieldDescription,
   FieldError,
   FieldLabel,
   FieldLegend,
@@ -21,6 +22,7 @@ import {
 import { formatData } from "@/lib/format"
 import { cn } from "@/lib/utils"
 import {
+  DIAS_FECHADOS,
   horariosDisponiveis,
   janelaDeDatas,
   type Horario,
@@ -118,12 +120,14 @@ export function SeletorData({
               disabled={[
                 { before: paraDate(primeiro) },
                 { after: paraDate(ultimo) },
+                { dayOfWeek: [...DIAS_FECHADOS] },
               ]}
               startMonth={paraDate(primeiro)}
               endMonth={paraDate(ultimo)}
             />
           </PopoverContent>
         </Popover>
+        <FieldDescription>Abrimos de segunda a sábado.</FieldDescription>
         <FieldError>{erroData}</FieldError>
       </Field>
 
